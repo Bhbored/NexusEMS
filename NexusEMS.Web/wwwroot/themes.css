@@ -1,0 +1,31 @@
+﻿:root {
+    --nexus-core-color: var(--nexus-light-color);
+    --nexus-core-background: var(--nexus-light-background-color);
+    --nexus-border-button-color: var(--nexus-light-button--color);
+    /* light colors*/
+    --nexus-light-color: #f3f2f1;
+    --nexus-light-background-color: #1e1e1e;
+    --nexus-light-button--color: #ffffff;
+    /* dark colors*/
+    --nexus-dark-color: #201f1e;
+    --nexus--dark-background-color: #1e1e1e;
+    --nexus-dark-button-color: #3b3a39;
+}
+
+
+body {
+    color: var(--nexus-core-color);
+    background-color: var(--nexus-core-background);
+}
+
+[data-core-theme="light"] {
+    --nexus-core-color: var(--nexus-light-color);
+    --nexus-core-background: var(--nexus-light-background-color);
+    --nexus-border-button-color: var(--nexus-light-button--color);
+}
+
+[data-core-dark="dark"] {
+    --nexus-core-color: var(--nexus-dark-color);
+    --nexus-core-background: var(--nexus--dark-background-color);
+    --nexus-border-button-color: var(--nexus-dark-button-color);
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="NexusEMS.Server/NexusEMS.Server.csproj" />
+  <Project Path="NexusEMS.Shared/NexusEMS.Shared.csproj" Id="904489d6-dbca-4c21-b054-6898d1b7a89a" />
+  <Project Path="NexusEMS.Web/NexusEMS.Web.csproj" />
+</Solution>

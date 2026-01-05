@@ -1,0 +1,6 @@
+@NexusEMS.Server_HostAddress = http://localhost:5033
+
+GET {{NexusEMS.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
