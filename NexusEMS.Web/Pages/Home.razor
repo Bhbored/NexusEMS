@@ -1,7 +1,26 @@
-﻿@page "/"
+@page "/"
+@layout EmptyLayout
+@using NexusEMS.Web.Services
+@using NexusEMS.Web.Pages.Shared
+@inject AppStateService AppState
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+@code {
+    protected override void OnInitialized()
+    {
+        if (AppState.IsAuthenticated)
+        {
+            if (AppState.IsAdmin)
+                Navigation.NavigateTo("/admin/dashboard");
+            else if (AppState.IsDepartmentChief)
+                Navigation.NavigateTo("/chief/dashboard");
+            else
+                Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            Navigation.NavigateTo("/login");
+        }
+    }
+}
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.

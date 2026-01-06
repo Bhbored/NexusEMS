@@ -1,6 +1,7 @@
 @page "/admin/departments"
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.UI
+@using NexusEMS.Web.Tests
 @inject NavigationManager Navigation
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -55,14 +56,14 @@
 
     protected override void OnInitialized()
     {
-        // Mock Data
-        Departments = new List<Department>
+        var departments = MockDepartments.GetDepartments();
+        var employees = MockEmployees.GetEmployees();
+        
+        Departments = departments.Select(d =>
         {
-            new Department { Id = 1, Name = "Engineering", Description = "Software Development & QA", HeadOfDepartmentName = "Alice Johnson", Employees = new List<Employee>(new Employee[45]), Budget = 500000 },
-            new Department { Id = 2, Name = "Sales", Description = "Global Sales Team", HeadOfDepartmentName = "Bob Smith", Employees = new List<Employee>(new Employee[30]), Budget = 300000 },
-            new Department { Id = 3, Name = "Human Resources", Description = "Recruiting & Employee Relations", HeadOfDepartmentName = "Diana Prince", Employees = new List<Employee>(new Employee[12]), Budget = 150000 },
-            new Department { Id = 4, Name = "Marketing", Description = "Brand & Communications", HeadOfDepartmentName = "Charlie Brown", Employees = new List<Employee>(new Employee[25]), Budget = 250000 }
-        };
+            d.Employees = employees.Where(e => e.DepartmentId == d.Id).ToList();
+            return d;
+        }).ToList();
     }
 
     private bool FilterDepartments(Department dept, string searchTerm)

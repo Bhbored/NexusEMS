@@ -1,6 +1,9 @@
 @page "/chief/dashboard"
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.Employee
+@using NexusEMS.Web.Services
+@using NexusEMS.Web.Tests
+@inject AppStateService AppState
 
 <div class="row g-3 mb-4">
     <!-- Stats Cards -->
@@ -55,15 +58,25 @@
 </div>
 
 @code {
-    private int MyTeamCount = 45;
-    private int ActiveTeamMembers = 42;
-    private int BudgetUtilization = 78;
+    private List<Employee> teamMembers = new();
+    private Department? myDepartment;
+    private List<Activity> TeamActivities = new();
+    
+    private int MyTeamCount => teamMembers.Count;
+    private int ActiveTeamMembers => teamMembers.Count(e => e.IsActive);
+    private int BudgetUtilization => myDepartment?.Budget > 0 ? (int)((teamMembers.Sum(e => e.Salary ?? 0) / (decimal)myDepartment.Budget) * 100) : 0;
 
-    private class Activity { public string Title { get; set; } public string Description { get; set; } public string TimeAgo { get; set; } }
-    private List<Activity> TeamActivities = new()
+    private class Activity { public string Title { get; set; } = string.Empty; public string Description { get; set; } = string.Empty; public string TimeAgo { get; set; } = string.Empty; }
+
+    protected override void OnInitialized()
     {
-        new Activity { Title = "New Hire", Description = "John Smith joined the team", TimeAgo = "2 days ago" },
-        new Activity { Title = "Leave Approved", Description = "Sarah's leave request approved", TimeAgo = "3 days ago" },
-        new Activity { Title = "Project Milestone", Description = "Q1 targets met", TimeAgo = "1 week ago" }
-    };
+        var employees = MockEmployees.GetEmployees();
+        var departments = MockDepartments.GetDepartments();
+        
+        if (AppState.CurrentUser?.DepartmentId.HasValue == true)
+        {
+            myDepartment = departments.FirstOrDefault(d => d.Id == AppState.CurrentUser.DepartmentId);
+            teamMembers = employees.Where(e => e.DepartmentId == AppState.CurrentUser.DepartmentId).ToList();
+        }
+    }
 }

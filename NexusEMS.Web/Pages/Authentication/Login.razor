@@ -1,52 +1,72 @@
 @page "/login"
-@using Microsoft.AspNetCore.Components.Authorization
-@inject NavigationManager Navigation
+@layout EmptyLayout
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Web.Services
-@using System.ComponentModel.DataAnnotations
+@using NexusEMS.Web.Pages.Shared
+@using NexusEMS.Web.Components.Common
 @inject AuthService AuthService
+@inject AppStateService AppState
+@inject NavigationManager Navigation
+
+@if (AppState.IsAuthenticated)
+{
+    <RedirectToDashboard />
+}
 
 <div class="login-container">
     <h2>Login</h2>
-    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
-        <DataAnnotationsValidator />
+    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
         <div class="form-group">
             <label for="username">Username:</label>
-            <InputText id="username" @bind-Value="loginModel.Username" class="form-control" />
-            <ValidationMessage For="@(() => loginModel.Username)" />
+            <InputText id="username" @bind-Value="username" class="form-control" />
         </div>
         <div class="form-group">
             <label for="password">Password:</label>
-            <InputText id="password" type="password" @bind-Value="loginModel.Password" class="form-control" />
-            <ValidationMessage For="@(() => loginModel.Password)" />
+            <InputText id="password" type="password" @bind-Value="password" class="form-control" />
         </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
         <button type="submit" class="btn btn-primary">Login</button>
     </EditForm>
 </div>
 
 @code {
-    public class LoginModel
-    {
-        [Required]
-        public string Username { get; set; } = string.Empty;
-        
-        [Required]
-        [StringLength(100, MinimumLength = 6)]
-        public string Password { get; set; } = string.Empty;
-    }
-
-    private LoginModel loginModel = new();
+    private object loginModel = new();
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private string errorMessage = string.Empty;
 
     private async Task HandleLogin()
     {
-        var result = await AuthService.Login(loginModel.Username, loginModel.Password);
-        if (result)
+        errorMessage = string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
-            Navigation.NavigateTo("/");
+            errorMessage = "Username and password are required.";
+            return;
+        }
+
+        var loggedInUser = await AuthService.Login(username, password);
+        
+        if (loggedInUser != null)
+        {
+            AppState.CurrentUser = loggedInUser;
+            
+            if (loggedInUser.Role == UserRole.Admin)
+            {
+                Navigation.NavigateTo("/admin/dashboard");
+            }
+            else if (loggedInUser.Role == UserRole.DepartmentChief)
+            {
+                Navigation.NavigateTo("/chief/dashboard");
+            }
         }
         else
         {
-            // Handle login failure
-            Console.WriteLine("Login failed");
+            errorMessage = "Invalid username or password.";
         }
     }
 }

@@ -2,6 +2,7 @@
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.Employee
 @using NexusEMS.Web.Components.Department
+@using NexusEMS.Web.Tests
 
 <div class="row g-3 mb-4">
     <!-- Stats Cards -->
@@ -86,7 +87,7 @@
     <div class="col-12">
         <h5 class="mb-3">Top Performers</h5>
     </div>
-    @foreach(var emp in TopEmployees)
+    @foreach(var emp in topEmployees)
     {
         <div class="col-md-4 col-lg-3">
             <EmployeeCard Employee="emp" />
@@ -96,21 +97,17 @@
 
 
 @code {
-    // Stats
-    private int TotalEmployees = 142;
-    private int ActiveEmployees = 138;
-    private int TotalDepartments = 8;
-    private int NewHires = 12;
+    private List<Employee> employees = new();
+    private List<Department> departments = new();
+    private List<Employee> topEmployees = new();
+    
+    private int TotalEmployees => employees.Count;
+    private int ActiveEmployees => employees.Count(e => e.IsActive);
+    private int TotalDepartments => departments.Count;
+    private int NewHires => employees.Count(e => e.HireDate >= DateTime.UtcNow.AddMonths(-1));
 
-    // Recent Activity Mock
-    private class ActivityItem { public string Title { get; set; } public string TimeAgo { get; set; } public string Type { get; set; } }
-    private List<ActivityItem> RecentActivities = new()
-    {
-        new ActivityItem { Title = "John Doe was added to Engineering", TimeAgo = "2 hours ago", Type = "plus" },
-        new ActivityItem { Title = "Q4 Marketing Budget Approved", TimeAgo = "5 hours ago", Type = "check" },
-        new ActivityItem { Title = "Sarah Smith updated profile", TimeAgo = "1 day ago", Type = "pencil" },
-        new ActivityItem { Title = "New Policy Document Uploaded", TimeAgo = "2 days ago", Type = "file" }
-    };
+    private class ActivityItem { public string Title { get; set; } = string.Empty; public string TimeAgo { get; set; } = string.Empty; public string Type { get; set; } = string.Empty; }
+    private List<ActivityItem> RecentActivities = new();
 
     private string GetActivityIcon(string type) => type switch
     {
@@ -121,27 +118,21 @@
         _ => "bi-activity"
     };
 
-    // Department Stats Mock
-    private class DeptStat { public string Name { get; set; } public int Count { get; set; } public int Percentage { get; set; } }
-    private List<DeptStat> DepartmentStats = new()
-    {
-        new DeptStat { Name = "Engineering", Count = 45, Percentage = 32 },
-        new DeptStat { Name = "Sales", Count = 30, Percentage = 21 },
-        new DeptStat { Name = "Human Resources", Count = 12, Percentage = 8 },
-        new DeptStat { Name = "Marketing", Count = 25, Percentage = 18 },
-    };
-
-    // Top Performers Mock
-    private List<Employee> TopEmployees = new();
+    private class DeptStat { public string Name { get; set; } = string.Empty; public int Count { get; set; } public int Percentage { get; set; } }
+    private List<DeptStat> DepartmentStats = new();
 
     protected override void OnInitialized()
     {
-        TopEmployees = new List<Employee>
+        employees = MockEmployees.GetEmployees();
+        departments = MockDepartments.GetDepartments();
+        topEmployees = employees.Take(4).ToList();
+        
+        var totalEmpCount = employees.Count;
+        DepartmentStats = departments.Select(d => new DeptStat
         {
-            new Employee { FirstName = "Alice", LastName = "Johnson", Position = "Senior Dev", Email = "alice@nexus.com", Department = new Department { Name = "Engineering" } },
-            new Employee { FirstName = "Bob", LastName = "Smith", Position = "Sales Lead", Email = "bob@nexus.com", Department = new Department { Name = "Sales" } },
-            new Employee { FirstName = "Charlie", LastName = "Brown", Position = "Product Owner", Email = "charlie@nexus.com", Department = new Department { Name = "Product" } },
-            new Employee { FirstName = "Diana", LastName = "Prince", Position = "HR Manager", Email = "diana@nexus.com", Department = new Department { Name = "HR" } }
-        };
+            Name = d.Name,
+            Count = employees.Count(e => e.DepartmentId == d.Id),
+            Percentage = totalEmpCount > 0 ? (int)((employees.Count(e => e.DepartmentId == d.Id) / (double)totalEmpCount) * 100) : 0
+        }).ToList();
     }
 }

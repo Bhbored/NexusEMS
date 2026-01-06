@@ -1,6 +1,5 @@
 ﻿(function() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-core-theme', savedTheme);
+    document.body.setAttribute('data-core-theme', 'light');
 })();
 
 window.toggleTheme = () => {
@@ -8,7 +7,6 @@ window.toggleTheme = () => {
     const currentTheme = body.getAttribute('data-core-theme') || 'light';
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     body.setAttribute('data-core-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
 };
 
 window.getTheme = () => {
