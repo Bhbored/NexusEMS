@@ -14,23 +14,188 @@
     <RedirectToDashboard />
 }
 
-<div class="login-container">
-    <h2>Login</h2>
-    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
-        <div class="form-group">
-            <label for="username">Username:</label>
-            <InputText id="username" @bind-Value="username" class="form-control" />
+<div class="d-flex min-vh-100">
+    <div class="login-left d-flex flex-column justify-content-between flex-fill p-5 position-relative overflow-hidden">
+        <!-- Background Abstract Elements -->
+        <div class="login-bg-blur-1"></div>
+        <div class="login-bg-blur-2"></div>
+
+        <!-- Brand Logo -->
+        <div class="position-relative z-10 d-flex align-items-center gap-3">
+            <div class="brand-icon"></div>
+            <h4 class="fw-bold mb-0">Nexus EMS</h4>
         </div>
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <InputText id="password" type="password" @bind-Value="password" class="form-control" />
+
+        <!-- Hero Content -->
+        <div class="position-relative z-10 flex-grow-1 d-flex flex-column justify-content-center">
+            <h1 class="display-4 fw-bold mb-4 lh-sm">
+                Streamline your workforce.<br />
+                <span class="login-gradient-text">Empower your people.</span>
+            </h1>
+            <p class="lead text-muted mb-5" style="max-width: 28rem;">
+                Manage teams effortlessly with our all-in-one employee management platform. Track performance, handle
+                payroll, and boost engagement.
+            </p>
+
         </div>
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <div class="alert alert-danger">@errorMessage</div>
-        }
-        <button type="submit" class="btn btn-primary">Login</button>
-    </EditForm>
+
+        <!-- Footer/Copyright -->
+        <div class="position-relative z-10 small text-muted">
+            © 2023 Nexus EMS Inc. All rights reserved.
+        </div>
+
+        <!-- Dashboard Image -->
+        <div class="login-dashboard-image position-absolute d-none d-xl-block">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-xpcMUJ39tnBWLU5Q7B9mfO6Ycko_24TCpby0szBF32u6dP4y-cOTUmAmLVg-aC3RRWNd1D1l9z5wmITrG0_5T6-WeVe8zLpiVTRrYl73FBGKS3mbmrqwxU4QZu39Mhc84UPXg3pcq3FcJTJF0FrDhdlF8Oo9rwtns2RccIdzn5M9gsMvN3kq7xCH1cvFmv2EFkghuwswxOo7lsaXVZu671ZjDAqpGXq0HxY4v4rdbwYPGP18qxuc-hzLoerpu9xCKA8rgBB5czSb"
+                alt="Dashboard" class="login-dashboard-img" />
+        </div>
+    </div>
+
+    <div
+        class="login-right d-flex flex-column justify-content-center align-items-center flex-fill p-4 p-sm-5 p-lg-5 position-relative d-none d-lg-flex">
+        <!-- Mobile Logo (Only visible on small screens) -->
+        <div class="d-lg-none w-100 d-flex justify-content-start mb-5">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-icon" style="width: 32px; height: 32px;"></div>
+                <h5 class="fw-bold mb-0">Nexus EMS</h5>
+            </div>
+        </div>
+
+        <div class="w-100" style="max-width: 420px;">
+            <!-- Header -->
+            <div class="mb-4">
+                <h2 class="fw-bold mb-2" style="font-size: 1.875rem;">Welcome Back</h2>
+                <p class="text-muted mb-0">Please enter your details to sign in.</p>
+            </div>
+
+            <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                <div class="mb-3">
+                    <label for="username" class="form-label small fw-semibold mb-2">Work Email</label>
+                    <div class="position-relative">
+                        <i
+                            class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="email" id="username" @bind="username" class="form-control ps-5 py-3 rounded"
+                            placeholder="name@company.com" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label small fw-semibold mb-2">Password</label>
+                    <div class="position-relative">
+                        <i class="bi bi-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="password" id="password" @bind="password"
+                            class="form-control ps-5 pe-5 py-3 rounded" placeholder="••••••••" />
+                        <button type="button"
+                            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                            style="text-decoration: none;">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe" />
+                        <label class="form-check-label small text-muted" for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="text-decoration-none small fw-bold text-info">Forgot password?</a>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary w-100 py-3 mb-3 rounded fw-bold">
+                    Sign In
+                </button>
+            </EditForm>
+
+            <div class="text-center mb-4">
+                <p class="text-muted small mb-0">Don't have an account? <a href="#"
+                        class="text-info fw-bold text-decoration-none">Contact HR</a></p>
+            </div>
+        </div>
+
+        <!-- Bottom Links -->
+        <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3 d-flex gap-4"
+            style="font-size: 0.75rem;">
+            <a href="#" class="text-muted text-decoration-none">Privacy Policy</a>
+            <a href="#" class="text-muted text-decoration-none">Terms of Service</a>
+            <a href="#" class="text-muted text-decoration-none">Help Center</a>
+        </div>
+    </div>
+
+    <!-- Mobile Login Button -->
+    <button class="btn btn-primary position-fixed top-0 end-0 m-3 shadow d-lg-none" style="z-index: 1050;"
+        @onclick="ToggleMobileLogin">
+        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+    </button>
+
+    <!-- Mobile Login Dropdown -->
+    <div class="position-fixed top-0 start-0 end-0 bottom-0 bg-dark bg-opacity-50 d-lg-none @(showMobileLogin ? "d-flex" : "d-none") align-items-center justify-content-center p-3"
+        style="z-index: 1051;">
+        <div class="bg-body rounded-3 p-4 w-100" style="max-width: 420px; max-height: 90vh; overflow-y: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Sign In</h5>
+                <button class="btn-close" @onclick="ToggleMobileLogin"></button>
+            </div>
+
+            <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                <div class="mb-3">
+                    <label for="mobile-username" class="form-label small fw-semibold mb-2">Work Email</label>
+                    <div class="position-relative">
+                        <i
+                            class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="email" id="mobile-username" @bind="username" class="form-control ps-5 py-3 rounded"
+                            placeholder="name@company.com" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mobile-password" class="form-label small fw-semibold mb-2">Password</label>
+                    <div class="position-relative">
+                        <i class="bi bi-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="password" id="mobile-password" @bind="password"
+                            class="form-control ps-5 pe-5 py-3 rounded" placeholder="••••••••" />
+                        <button type="button"
+                            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                            style="text-decoration: none;">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="mobile-rememberMe" />
+                        <label class="form-check-label small text-muted" for="mobile-rememberMe">Remember me</label>
+                    </div>
+                    <a href="#" class="text-decoration-none small fw-bold text-info">Forgot password?</a>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        @errorMessage
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary w-100 py-3 mb-3 rounded fw-bold">
+                    Sign In
+                </button>
+            </EditForm>
+
+            <div class="text-center mt-3">
+                <p class="text-muted small mb-0">Don't have an account? <a href="#"
+                        class="text-info fw-bold text-decoration-none">Contact HR</a></p>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -38,11 +203,17 @@
     private string username = string.Empty;
     private string password = string.Empty;
     private string errorMessage = string.Empty;
+    private bool showMobileLogin = false;
+
+    private void ToggleMobileLogin()
+    {
+        showMobileLogin = !showMobileLogin;
+    }
 
     private async Task HandleLogin()
     {
         errorMessage = string.Empty;
-        
+
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
             errorMessage = "Username and password are required.";
@@ -50,11 +221,12 @@
         }
 
         var loggedInUser = await AuthService.Login(username, password);
-        
+
         if (loggedInUser != null)
         {
             AppState.CurrentUser = loggedInUser;
-            
+            showMobileLogin = false;
+
             if (loggedInUser.Role == UserRole.Admin)
             {
                 Navigation.NavigateTo("/admin/dashboard");

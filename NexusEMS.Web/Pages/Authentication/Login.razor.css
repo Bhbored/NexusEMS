@@ -1,38 +1,95 @@
-.login-container {
-    min-height: 100vh;
+/* Only custom styles that can't be achieved with Bootstrap */
+.login-left {
+    background: linear-gradient(135deg, #e0f7f7 0%, #ffffff 100%);
+    width: 55%;
+}
+
+.login-right {
+    background: var(--bs-body-bg);
+    width: 45%;
+}
+
+.login-gradient-text {
+    background: linear-gradient(to right, #14b8a6, #0df2f2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-bg-blur-1 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 384px;
+    height: 384px;
+    background: rgba(13, 242, 242, 0.2);
+    border-radius: 50%;
+    filter: blur(80px);
+    transform: translate(20%, -20%);
+}
+
+.login-bg-blur-2 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 320px;
+    height: 320px;
+    background: rgba(13, 242, 242, 0.1);
+    border-radius: 50%;
+    filter: blur(80px);
+    transform: translate(-20%, 20%);
+}
+
+.brand-icon {
+    width: 40px;
+    height: 40px;
+    background: #0df2f2;
+    border-radius: 0.5rem;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--bs-body-bg) 0%, var(--bs-tertiary-bg) 100%);
+    color: #0d1c1c;
 }
 
-.login-container h2 {
-    font-weight: 700;
+.brand-icon::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-image: 
+        linear-gradient(#0d1c1c 1px, transparent 1px),
+        linear-gradient(90deg, #0d1c1c 1px, transparent 1px);
+    background-size: 5px 5px;
 }
 
-.login-container .card {
-    max-width: 420px;
-    box-shadow: 0 10px 40px var(--shadow);
-    border: none;
+
+.login-dashboard-image {
+    right: -10%;
+    bottom: 15%;
+    width: 60%;
+    aspect-ratio: 4/3;
 }
 
-.form-control {
-    transition: all 0.2s ease;
+.login-dashboard-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem 0 0 0;
+    border: 4px solid white;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: rotate(-2deg);
+    opacity: 0.9;
 }
 
-.form-control:focus {
-    transform: translateY(-1px);
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
-}
-
-.btn-primary {
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(var(--bs-primary-rgb), 0.4);
+/* Mobile styles - only apply on mobile */
+@media (max-width: 991.98px) {
+    .login-left {
+        min-height: 100vh;
+        width: 100% !important;
+        justify-content: flex-start !important;
+        padding-top: 5rem !important;
+    }
+    
+    .login-right {
+        width: 100% !important;
+    }
 }

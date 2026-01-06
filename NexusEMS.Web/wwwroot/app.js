@@ -8,7 +8,3 @@ window.toggleTheme = () => {
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     body.setAttribute('data-core-theme', newTheme);
 };
-
-window.getTheme = () => {
-    return document.body.getAttribute('data-core-theme') || 'light';
-};
