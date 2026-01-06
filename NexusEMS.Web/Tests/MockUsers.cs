@@ -37,8 +37,8 @@ public static class MockUsers
     {
         return new Dictionary<string, string>
         {
-            { "admin", "admin" },
-            { "chief", "chief" }
+            { "admin@nexus.com", "admin" },
+            { "chief@nexus.com", "chief" }
         };
     }
 }

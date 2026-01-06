@@ -16,16 +16,16 @@ public class AuthService
         _userPasswords = MockUsers.GetUserPasswords();
     }
 
-    public async Task<User?> Login(string username, string password)
+    public async Task<User?> Login(string email, string password)
     {
         await Task.Delay(100);
         
         var user = _users.FirstOrDefault(u => 
-            u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+            u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
         
         if (user != null && user.IsActive)
         {
-            if (_userPasswords.TryGetValue(user.Username, out var storedPassword) && 
+            if (_userPasswords.TryGetValue(user.Email, out var storedPassword) && 
                 storedPassword == password)
             {
                 _currentUser = user;
