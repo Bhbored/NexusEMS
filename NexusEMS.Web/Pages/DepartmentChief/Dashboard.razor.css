@@ -1,26 +1,95 @@
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Dashboard Stat Cards */
+.dashboard-stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--bs-border-color) !important;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0.75rem 1.5rem var(--shadow-hover) !important;
+.dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-hover) !important;
 }
 
-.border-start {
-    border-width: 4px !important;
+.dashboard-stat-cyan {
+    color: var(--cyan);
 }
 
-.list-group-item {
-    transition: all 0.2s ease;
+.dashboard-stat-blue {
+    color: var(--blue);
 }
 
-.list-group-item:hover {
-    transform: translateX(4px);
-    background-color: var(--list-group-hover) !important;
+.dashboard-stat-orange {
+    color: var(--orange);
 }
 
-h5 {
-    font-weight: 700;
+/* Icon Backgrounds */
+.dashboard-icon-bg {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
 }
 
+.dashboard-icon-cyan {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+[data-core-theme="dark"] .dashboard-icon-cyan {
+    background-color: var(--cyan-900);
+    color: var(--cyan);
+}
+
+.dashboard-icon-green {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+[data-core-theme="dark"] .dashboard-icon-green {
+    background-color: rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.dashboard-icon-blue {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+[data-core-theme="dark"] .dashboard-icon-blue {
+    background-color: var(--blue-900);
+    color: var(--blue);
+}
+
+.dashboard-icon-orange {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+[data-core-theme="dark"] .dashboard-icon-orange {
+    background-color: var(--orange-900);
+    color: var(--orange);
+}
+
+/* Empty State */
+.dashboard-empty-state {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 0.75rem;
+    background-color: var(--bs-body-bg);
+    min-height: 200px;
+}
+
+[data-core-theme="dark"] .dashboard-empty-state {
+    background-color: rgba(31, 41, 55, 0.5);
+}
+
+.dashboard-empty-icon {
+    width: 64px;
+    height: 64px;
+    background-color: var(--activity-icon-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,13 +1,13 @@
 @page "/admin/employees/edit/{Id:int}"
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
+@using NexusEMS.Web.Tests
 @inject NavigationManager Navigation
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Edit Employee</h3>
-        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to List</button>
-    </div>
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">Edit Employee</h1>
+    <p class="text-muted mb-0">Update the employee information below.</p>
+</div>
 
     @if (Employee == null)
     {
@@ -19,8 +19,8 @@
     }
     else
     {
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
+        <div class="card employee-form-card border-0 shadow-sm">
+            <div class="card-body p-5">
                 <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
                    
@@ -102,16 +102,15 @@
                             </div>
                         </div>
 
-                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                             <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
-                             <button type="submit" class="btn btn-primary">Save Changes</button>
+                         <div class="col-12 mt-5 d-flex justify-content-end gap-3">
+                             <button type="button" class="btn btn-outline-secondary employee-form-btn" @onclick="GoBack">Cancel</button>
+                             <button type="submit" class="btn btn-primary employee-form-btn">Save Changes</button>
                          </div>
                     </div>
                 </EditForm>
             </div>
         </div>
     }
-</div>
 
 @code {
     [Parameter] public int Id { get; set; }
@@ -120,28 +119,27 @@
 
     protected override void OnInitialized()
     {
-        // Mock Departments
-        Departments = new List<Department>
-        {
-            new Department { Id = 1, Name = "Engineering" },
-            new Department { Id = 2, Name = "Sales" },
-            new Department { Id = 3, Name = "HR" },
-            new Department { Id = 4, Name = "Marketing" }
-        };
+        Departments = MockDepartments.GetDepartments();
         
         // Mock Employee Load
-        Employee = new Employee 
-        { 
-            Id = Id, 
-            FirstName = "John", 
-            LastName = "Doe", 
-            Email = "john.doe@nexus.com", 
-            DepartmentId = 1, 
-            Position = "Software Engineer",
-            HireDate = DateTime.Today.AddYears(-2),
-            IsActive = true,
-            EmploymentType = "FullTime"
-        };
+        var employees = MockEmployees.GetEmployees();
+        Employee = employees.FirstOrDefault(e => e.Id == Id);
+        
+        if (Employee == null)
+        {
+            Employee = new Employee 
+            { 
+                Id = Id, 
+                FirstName = "John", 
+                LastName = "Doe", 
+                Email = "john.doe@nexus.com", 
+                DepartmentId = 1, 
+                Position = "Software Engineer",
+                HireDate = DateTime.Today.AddYears(-2),
+                IsActive = true,
+                EmploymentType = "FullTime"
+            };
+        }
     }
 
     private void HandleValidSubmit()

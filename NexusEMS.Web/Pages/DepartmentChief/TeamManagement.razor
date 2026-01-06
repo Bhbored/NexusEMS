@@ -6,8 +6,9 @@
 @inject NavigationManager Navigation
 @inject AppStateService AppState
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Team Management</h3>
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">Team Management</h1>
+    <p class="text-muted mb-0">Manage your team members and their account permissions here.</p>
 </div>
 
 <DataGrid TItem="Employee" Items="@MyTeam" Title="@($"{MyDepartmentName} Employees")"
@@ -22,33 +23,47 @@
     </HeaderContent>
     <RowTemplate Context="employee">
         <td>
-            <div class="fw-bold">@employee.FirstName @employee.LastName</div>
+            <div class="d-flex align-items-center">
+                <div class="employee-avatar-small employee-avatar-@GetAvatarColor(employee.Id) me-3">
+                    <span class="fw-bold">@GetInitials(employee.FirstName, employee.LastName)</span>
+                </div>
+                <div>
+                    <div class="fw-medium">@employee.FirstName @employee.LastName</div>
+                </div>
+            </div>
         </td>
         <td>@employee.Position</td>
         <td>@employee.Email</td>
         <td>@employee.HireDate.ToShortDateString()</td>
         <td>
-            <span class="badge @(employee.IsActive ? "bg-success" : "bg-warning")">
+            <span class="badge employee-status-badge-modern">
                 @(employee.IsActive ? "Active" : "Inactive")
             </span>
         </td>
         <td class="text-end">
-            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditEmployee(employee.Id)"
-                title="Edit Details">
-                <i class="bi bi-pencil-square"></i>
-            </button>
-            @if (employee.IsActive)
-            {
-                <button class="btn btn-sm btn-outline-warning" @onclick="() => ToggleStatus(employee)" title="Deactivate">
-                    <i class="bi bi-person-slash"></i>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-sm employee-action-btn employee-action-edit" 
+                        @onclick="() => EditEmployee(employee.Id)"
+                        title="Edit Details">
+                    <i class="bi bi-pencil"></i>
                 </button>
-            }
-            else
-            {
-                <button class="btn btn-sm btn-outline-success" @onclick="() => ToggleStatus(employee)" title="Activate">
-                    <i class="bi bi-person-check"></i>
-                </button>
-            }
+                @if (employee.IsActive)
+                {
+                    <button class="btn btn-sm employee-action-btn employee-action-warning" 
+                            @onclick="() => ToggleStatus(employee)" 
+                            title="Deactivate">
+                        <i class="bi bi-person-slash"></i>
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-sm employee-action-btn employee-action-success" 
+                            @onclick="() => ToggleStatus(employee)" 
+                            title="Activate">
+                        <i class="bi bi-person-check"></i>
+                    </button>
+                }
+            </div>
         </td>
     </RowTemplate>
 </DataGrid>
@@ -88,5 +103,18 @@
     {
         emp.IsActive = !emp.IsActive;
         // Mock API call to save status
+        StateHasChanged();
+    }
+
+    private string GetInitials(string? first, string? last)
+    {
+        return $"{(first?.FirstOrDefault())}{(last?.FirstOrDefault())}";
+    }
+
+    private string GetAvatarColor(int employeeId)
+    {
+        var colors = new[] { "indigo", "blue", "orange", "pink" };
+        var index = (employeeId - 1) % colors.Length;
+        return colors[index];
     }
 }

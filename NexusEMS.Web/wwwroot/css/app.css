@@ -12,8 +12,9 @@
 
 html, body {
     font-family: "Ubuntu", sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     font-style: normal;
+    line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -21,12 +22,42 @@ h1, h2, h3, h4, h5, h6 {
     font-optical-sizing: auto;
     font-weight: 700;
     font-style: normal;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
+
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-weight: 700;
     font-style: normal;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+/* Improved font weights for better hierarchy */
+h1 {
+    font-weight: 800;
+}
+
+h2 {
+    font-weight: 700;
+}
+
+h3, h4 {
+    font-weight: 600;
+}
+
+h5, h6 {
+    font-weight: 600;
+}
+
+.fw-semibold {
+    font-weight: 600;
+}
+
+.fw-bold {
+    font-weight: 700;
 }
 
     #blazor-error-ui {

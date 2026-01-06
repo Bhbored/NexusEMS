@@ -1,97 +1,101 @@
 @page "/admin/employees/create"
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
+@using NexusEMS.Web.Tests
 @inject NavigationManager Navigation
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Add New Employee</h3>
-        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to List</button>
-    </div>
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">Add New Employee</h1>
+    <p class="text-muted mb-0">Fill in the employee information below.</p>
+</div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
-                <DataAnnotationsValidator />
-               
-                <div class="row g-3">
-                    <h5 class="mb-3 text-muted border-bottom pb-2">Personal Information</h5>
-                    
-                    <div class="col-md-6">
-                        <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
-                        <InputText id="firstName" class="form-control" @bind-Value="Employee.FirstName" placeholder="John" />
-                        <ValidationMessage For="@(() => Employee.FirstName)" />
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-                         <InputText id="lastName" class="form-control" @bind-Value="Employee.LastName" placeholder="Doe" />
-                        <ValidationMessage For="@(() => Employee.LastName)" />
-                    </div>
+<div class="card employee-form-card border-0 shadow-sm">
+    <div class="card-body p-5">
+        <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
 
-                     <div class="col-md-6">
-                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                         <InputText id="email" class="form-control" @bind-Value="Employee.Email" placeholder="john.doe@nexus.com" />
-                         <ValidationMessage For="@(() => Employee.Email)" />
-                    </div>
+            <div class="row g-3">
+                <h5 class="mb-3 text-muted border-bottom pb-2">Personal Information</h5>
 
-                     <div class="col-md-6">
-                        <label for="phone" class="form-label">Phone</label>
-                         <InputText id="phone" class="form-control" @bind-Value="Employee.Phone" placeholder="+1 (555) 000-0000" />
-                        <ValidationMessage For="@(() => Employee.Phone)" />
-                    </div>
-                     <div class="col-md-6">
-                        <label for="dob" class="form-label">Date of Birth</label>
-                         <InputDate id="dob" class="form-control" @bind-Value="Employee.DateOfBirth" />
-                    </div>
-
-                    <h5 class="mb-3 mt-5 text-muted border-bottom pb-2">Employment Details</h5>
-
-                     <div class="col-md-6">
-                        <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
-                        <InputSelect id="department" class="form-select text-dark" @bind-Value="Employee.DepartmentId">
-                            <option value="0">Select Department...</option>
-                            @foreach (var dept in Departments)
-                            {
-                                <option value="@dept.Id">@dept.Name</option>
-                            }
-                        </InputSelect>
-                         <ValidationMessage For="@(() => Employee.DepartmentId)" />
-                    </div>
-
-                     <div class="col-md-6">
-                        <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
-                         <InputText id="position" class="form-control" @bind-Value="Employee.Position" placeholder="Software Engineer" />
-                         <ValidationMessage For="@(() => Employee.Position)" />
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <label for="hireDate" class="form-label">Hire Date <span class="text-danger">*</span></label>
-                         <InputDate id="hireDate" class="form-control" @bind-Value="Employee.HireDate" />
-                         <ValidationMessage For="@(() => Employee.HireDate)" />
-                    </div>
-
-                      <div class="col-md-6">
-                        <label for="salary" class="form-label">Salary</label>
-                         <InputNumber id="salary" class="form-control" @bind-Value="Employee.Salary" placeholder="0.00" />
-                    </div>
-                     
-                    <div class="col-md-6">
-                        <label for="empType" class="form-label">Employment Type</label>
-                         <InputSelect id="empType" class="form-select text-dark" @bind-Value="Employee.EmploymentType">
-                            <option value="FullTime">Full Time</option>
-                            <option value="PartTime">Part Time</option>
-                            <option value="Contract">Contract</option>
-                        </InputSelect>
-                    </div>
-
-                     <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                         <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
-                         <button type="submit" class="btn btn-primary">Create Employee</button>
-                     </div>
+                <div class="col-md-6">
+                    <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                    <InputText id="firstName" class="form-control" @bind-Value="Employee.FirstName"
+                        placeholder="John" />
+                    <ValidationMessage For="@(() => Employee.FirstName)" />
                 </div>
-            </EditForm>
-        </div>
+
+                <div class="col-md-6">
+                    <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <InputText id="lastName" class="form-control" @bind-Value="Employee.LastName" placeholder="Doe" />
+                    <ValidationMessage For="@(() => Employee.LastName)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <InputText id="email" class="form-control" @bind-Value="Employee.Email"
+                        placeholder="john.doe@nexus.com" />
+                    <ValidationMessage For="@(() => Employee.Email)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone</label>
+                    <InputText id="phone" class="form-control" @bind-Value="Employee.Phone"
+                        placeholder="+1 (555) 000-0000" />
+                    <ValidationMessage For="@(() => Employee.Phone)" />
+                </div>
+                <div class="col-md-6">
+                    <label for="dob" class="form-label">Date of Birth</label>
+                    <InputDate id="dob" class="form-control" @bind-Value="Employee.DateOfBirth" />
+                </div>
+
+                <h5 class="mb-3 mt-5 text-muted border-bottom pb-2">Employment Details</h5>
+
+                <div class="col-md-6">
+                    <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
+                    <InputSelect id="department" class="form-select text-dark" @bind-Value="Employee.DepartmentId">
+                        <option value="0">Select Department...</option>
+                        @foreach (var dept in Departments)
+                        {
+                            <option value="@dept.Id">@dept.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Employee.DepartmentId)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
+                    <InputText id="position" class="form-control" @bind-Value="Employee.Position"
+                        placeholder="Software Engineer" />
+                    <ValidationMessage For="@(() => Employee.Position)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="hireDate" class="form-label">Hire Date <span class="text-danger">*</span></label>
+                    <InputDate id="hireDate" class="form-control" @bind-Value="Employee.HireDate" />
+                    <ValidationMessage For="@(() => Employee.HireDate)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="salary" class="form-label">Salary</label>
+                    <InputNumber id="salary" class="form-control" @bind-Value="Employee.Salary" placeholder="0.00" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="empType" class="form-label">Employment Type</label>
+                    <InputSelect id="empType" class="form-select text-dark" @bind-Value="Employee.EmploymentType">
+                        <option value="FullTime">Full Time</option>
+                        <option value="PartTime">Part Time</option>
+                        <option value="Contract">Contract</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-12 mt-5 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn btn-outline-secondary employee-form-btn"
+                        @onclick="GoBack">Cancel</button>
+                    <button type="submit" class="btn btn-primary employee-form-btn">Create Employee</button>
+                </div>
+            </div>
+        </EditForm>
     </div>
 </div>
 
@@ -101,14 +105,7 @@
 
     protected override void OnInitialized()
     {
-        // Mock Departments
-        Departments = new List<Department>
-        {
-            new Department { Id = 1, Name = "Engineering" },
-            new Department { Id = 2, Name = "Sales" },
-            new Department { Id = 3, Name = "HR" },
-            new Department { Id = 4, Name = "Marketing" }
-        };
+        Departments = MockDepartments.GetDepartments();
     }
 
     private void HandleValidSubmit()

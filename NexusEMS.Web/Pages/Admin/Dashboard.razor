@@ -4,30 +4,79 @@
 @using NexusEMS.Web.Components.Department
 @using NexusEMS.Web.Tests
 
-<div class="row g-3 mb-4">
+<div class="row g-4 mb-4">
     <!-- Stats Cards -->
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm border-start border-primary border-4">
-            <div class="text-muted small text-uppercase fw-bold">Total Employees</div>
-            <div class="fs-2 fw-bold text-primary">@TotalEmployees</div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-stat-card border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-uppercase small fw-semibold mb-1 text-muted">Total Employees</p>
+                        <h3 class="display-6 fw-bold mb-0 dashboard-stat-cyan">@TotalEmployees</h3>
+                    </div>
+                    <div class="dashboard-icon-bg dashboard-icon-cyan">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center small text-success">
+                    <i class="bi bi-arrow-up me-1"></i>
+                    <span>+2% from last month</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card p-3 shadow-sm border-start border-success border-4">
-             <div class="text-muted small text-uppercase fw-bold">Active Employees</div>
-             <div class="fs-2 fw-bold text-success">@ActiveEmployees</div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-stat-card border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-uppercase small fw-semibold mb-1 text-muted">Active Employees</p>
+                        <h3 class="display-6 fw-bold mb-0 text-success">@ActiveEmployees</h3>
+                    </div>
+                    <div class="dashboard-icon-bg dashboard-icon-green">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center small text-muted">
+                    <span>100% active rate</span>
+                </div>
+            </div>
         </div>
     </div>
-     <div class="col-md-3">
-        <div class="card p-3 shadow-sm border-start border-info border-4">
-             <div class="text-muted small text-uppercase fw-bold">Departments</div>
-             <div class="fs-2 fw-bold text-info">@TotalDepartments</div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-stat-card border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-uppercase small fw-semibold mb-1 text-muted">Departments</p>
+                        <h3 class="display-6 fw-bold mb-0 dashboard-stat-blue">@TotalDepartments</h3>
+                    </div>
+                    <div class="dashboard-icon-bg dashboard-icon-blue">
+                        <i class="bi bi-building fs-4"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center small text-muted">
+                    <span>Across 2 locations</span>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-         <div class="card p-3 shadow-sm border-start border-warning border-4">
-             <div class="text-muted small text-uppercase fw-bold">New Hires</div>
-             <div class="fs-2 fw-bold text-warning">@NewHires</div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-stat-card border-0">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <p class="text-uppercase small fw-semibold mb-1 text-muted">New Hires</p>
+                        <h3 class="display-6 fw-bold mb-0 dashboard-stat-orange">@NewHires</h3>
+                    </div>
+                    <div class="dashboard-icon-bg dashboard-icon-orange">
+                        <i class="bi bi-person-plus fs-4"></i>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center small text-muted">
+                    <span>No hires this month</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -35,24 +84,42 @@
 <div class="row g-4">
     <!-- Recent Activity -->
     <div class="col-lg-8">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
-                <h5 class="card-title m-0">Recent Activity</h5>
-                <button class="btn btn-sm btn-outline-secondary">View All</button>
-            </div>
-            <div class="list-group list-group-flush">
-                @foreach (var activity in RecentActivities)
+        <div class="card border-0 h-100">
+            <div class="card-body p-4 d-flex flex-column h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="h5 fw-semibold mb-0">Recent Activity</h2>
+                    <button class="btn btn-sm dashboard-view-all-btn">View All</button>
+                </div>
+                @if (RecentActivities.Any())
                 {
-                    <div class="list-group-item d-flex align-items-center py-3">
-                        <div class="me-3">
-                            <span class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 40px; height: 40px;">
-                                <i class="bi @GetActivityIcon(activity.Type) fs-5 text-muted"></i>
-                            </span>
+                    <div class="list-group list-group-flush">
+                        @foreach (var activity in RecentActivities)
+                        {
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <div class="me-3">
+                                    <span
+                                        class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="bi @GetActivityIcon(activity.Type) fs-5 text-muted"></i>
+                                    </span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold text-dark">@activity.Title</div>
+                                    <small class="text-muted">@activity.TimeAgo</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div
+                        class="flex-grow-1 d-flex flex-column align-items-center justify-content-center p-5 dashboard-empty-state">
+                        <div class="dashboard-empty-icon mb-3">
+                            <i class="bi bi-clock-history fs-1 text-muted"></i>
                         </div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold text-dark">@activity.Title</div>
-                            <small class="text-muted">@activity.TimeAgo</small>
-                        </div>
+                        <h3 class="h6 fw-medium mb-1">No recent activity</h3>
+                        <p class="small text-muted mb-0">Updates and changes will appear here.</p>
                     </div>
                 }
             </div>
@@ -61,38 +128,40 @@
 
     <!-- Department Distribution -->
     <div class="col-lg-4">
-         <div class="card shadow-sm h-100">
-            <div class="card-header bg-body py-3">
-                <h5 class="card-title m-0">Department Distribution</h5>
-            </div>
-            <div class="card-body">
-                @foreach (var dept in DepartmentStats)
-                {
-                     <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="fw-bold small">@dept.Name</span>
-                            <span class="small text-muted">@dept.Count Employees</span>
+        <div class="card border-0 h-100">
+            <div class="card-body p-4">
+                <h2 class="h5 fw-semibold mb-4">Department Distribution</h2>
+                <div class="dashboard-dept-list">
+                    @foreach (var dept in DepartmentStats)
+                    {
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small fw-medium">@dept.Name</span>
+                                <span class="small text-muted">@dept.Count Employees</span>
+                            </div>
+                            <div class="progress dashboard-progress" style="height: 8px;">
+                                <div class="progress-bar dashboard-progress-bar" role="progressbar"
+                                    style="width: @(dept.Percentage)%" aria-valuenow="@dept.Percentage" aria-valuemin="0"
+                                    aria-valuemax="100"></div>
+                            </div>
                         </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" role="progressbar" style="width: @(dept.Percentage)%" aria-valuenow="@dept.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-         </div>
+        </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <h5 class="mb-3">Top Performers</h5>
+<div class="mb-4">
+    <h2 class="h5 fw-semibold mb-4">Top Performers</h2>
+    <div class="row g-4">
+        @foreach (var emp in topEmployees)
+        {
+            <div class="col-md-6 col-xl-3">
+                <EmployeeCard Employee="emp" />
+            </div>
+        }
     </div>
-    @foreach(var emp in topEmployees)
-    {
-        <div class="col-md-4 col-lg-3">
-            <EmployeeCard Employee="emp" />
-        </div>
-    }
 </div>
 
 
@@ -100,13 +169,17 @@
     private List<Employee> employees = new();
     private List<Department> departments = new();
     private List<Employee> topEmployees = new();
-    
+
     private int TotalEmployees => employees.Count;
     private int ActiveEmployees => employees.Count(e => e.IsActive);
     private int TotalDepartments => departments.Count;
     private int NewHires => employees.Count(e => e.HireDate >= DateTime.UtcNow.AddMonths(-1));
 
-    private class ActivityItem { public string Title { get; set; } = string.Empty; public string TimeAgo { get; set; } = string.Empty; public string Type { get; set; } = string.Empty; }
+    private class ActivityItem
+    {
+        public string Title { get; set; } = string.Empty; public string TimeAgo { get; set; } =
+        string.Empty; public string Type { get; set; } = string.Empty;
+    }
     private List<ActivityItem> RecentActivities = new();
 
     private string GetActivityIcon(string type) => type switch
@@ -118,7 +191,13 @@
         _ => "bi-activity"
     };
 
-    private class DeptStat { public string Name { get; set; } = string.Empty; public int Count { get; set; } public int Percentage { get; set; } }
+    private class DeptStat
+    {
+        public string Name { get; set; } = string.Empty; public int Count { get; set; }
+        public int
+        Percentage
+        { get; set; }
+    }
     private List<DeptStat> DepartmentStats = new();
 
     protected override void OnInitialized()
@@ -126,7 +205,7 @@
         employees = MockEmployees.GetEmployees();
         departments = MockDepartments.GetDepartments();
         topEmployees = employees.Take(4).ToList();
-        
+
         var totalEmpCount = employees.Count;
         DepartmentStats = departments.Select(d => new DeptStat
         {

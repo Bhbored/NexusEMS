@@ -1,28 +1,76 @@
-h3 {
+/* Department List Modern Styles */
+.department-description {
+    color: var(--text-muted);
+}
+
+.department-head-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
     font-weight: 700;
 }
 
-.btn-sm {
+.department-head-avatar-indigo {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+[data-core-theme="dark"] .department-head-avatar-indigo {
+    background-color: rgba(99, 102, 241, 0.3);
+    color: #818cf8;
+}
+
+.department-employee-badge {
+    background-color: var(--activity-icon-bg);
+    color: var(--bs-body-color);
+    border-radius: 9999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.department-budget {
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--bs-body-color);
+}
+
+.department-action-btn {
+    padding: 0.375rem;
+    border: none;
+    border-radius: 0.375rem;
+    background-color: transparent;
+    color: var(--text-muted);
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
 }
 
-.btn-sm:hover {
-    transform: translateY(-2px);
+.department-action-btn:hover {
+    transform: translateY(-1px);
 }
 
-.btn-outline-primary:hover {
-    box-shadow: 0 4px 8px rgb(var(--bs-primary-rgb) / 0.3);
+.department-action-edit:hover {
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
 }
 
-.btn-outline-danger:hover {
-    box-shadow: 0 4px 8px rgb(var(--bs-danger-rgb) / 0.3);
+[data-core-theme="dark"] .department-action-edit:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.3);
 }
 
-.badge {
-    transition: all 0.2s ease;
+.department-action-delete:hover {
+    color: var(--bs-danger);
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
-.badge:hover {
-    transform: scale(1.05);
+[data-core-theme="dark"] .department-action-delete:hover {
+    background-color: rgba(220, 53, 69, 0.3);
 }
-

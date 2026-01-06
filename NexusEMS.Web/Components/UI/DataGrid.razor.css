@@ -1,41 +1,131 @@
-.card {
-    transition: box-shadow 0.3s ease;
+/* Modern DataGrid Styles */
+.datagrid-modern {
+    border-radius: 1rem;
+    overflow: hidden;
 }
 
-.table {
+.datagrid-header {
+    background-color: var(--bs-card-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.datagrid-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 256px;
+}
+
+.datagrid-search-icon {
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.datagrid-search-input {
+    padding-left: 2.5rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    background-color: var(--input-bg);
+    color: var(--input-color);
     transition: all 0.2s ease;
 }
 
-.table tbody tr {
+.datagrid-search-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1);
+    outline: none;
+}
+
+.datagrid-add-btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-.table tbody tr:hover {
-    transform: scale(1.01);
-}
-
-.btn-sm {
-    transition: all 0.2s ease;
-}
-
-.btn-sm:hover {
-    transform: translateY(-2px);
-}
-
-.page-link {
-    transition: all 0.2s ease;
-}
-
-.page-link:hover {
-    transform: translateY(-2px);
-}
-
-.form-control-sm {
-    transition: all 0.2s ease;
-}
-
-.form-control-sm:focus {
+.datagrid-add-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.3);
 }
 
+.datagrid-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.datagrid-thead {
+    background-color: var(--table-striped-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.datagrid-thead th {
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.datagrid-tbody tr {
+    border-bottom: 1px solid var(--bs-border-color);
+    transition: background-color 0.15s ease;
+}
+
+.datagrid-tbody tr:hover {
+    background-color: var(--table-hover-bg);
+}
+
+.datagrid-tbody td {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    color: var(--bs-body-color);
+    vertical-align: middle;
+}
+
+.datagrid-footer {
+    background-color: var(--table-striped-bg);
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.datagrid-pagination-btn {
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    background-color: transparent;
+    transition: all 0.2s ease;
+    min-width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.datagrid-pagination-btn:hover:not(:disabled) {
+    background-color: var(--bs-card-bg);
+    color: var(--bs-body-color);
+    box-shadow: 0 1px 3px var(--shadow);
+}
+
+.datagrid-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.datagrid-pagination-active {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+    box-shadow: 0 1px 3px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.datagrid-pagination-active:hover {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}

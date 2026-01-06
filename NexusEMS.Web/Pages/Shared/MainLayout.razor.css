@@ -1,5 +1,7 @@
 .sidebar {
     box-shadow: 2px 0 8px var(--shadow);
+    width: var(--sidebar-width);
+    transition: background-color 0.3s;
 }
 
 .sidebar .fs-4 {
@@ -13,6 +15,7 @@
 header {
     box-shadow: 0 2px 4px var(--shadow);
     backdrop-filter: blur(10px);
+    z-index: 100;
 }
 
 .btn-outline-secondary {
@@ -39,4 +42,27 @@ header {
 
 .dropdown-item:hover {
     transform: translateX(4px);
+}
+
+/* Mobile Offcanvas Styles */
+.offcanvas {
+    background-color: var(--sidebar-bg);
+    color: var(--nav-link-color);
+    max-width: 250px;
+}
+
+.offcanvas-header {
+    border-bottom-color: var(--bs-border-color);
+}
+
+.offcanvas-title {
+    color: var(--bs-primary);
+}
+
+.btn-close {
+    filter: var(--bs-btn-close-white-filter);
+}
+
+[data-core-theme="light"] .btn-close {
+    filter: none;
 }

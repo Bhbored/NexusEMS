@@ -5,51 +5,73 @@
 @using NexusEMS.Web.Tests
 @inject AppStateService AppState
 
-<div class="container-fluid">
-    <h3 class="mb-4">My Department</h3>
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">My Department</h1>
+    <p class="text-muted mb-0">View and manage your department information.</p>
+</div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h2 class="text-primary fw-bold mb-1">@DepartmentModel.Name</h2>
-                            <p class="lead text-muted">@DepartmentModel.Description</p>
+@if (DepartmentModel == null)
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card department-detail-card border-0 shadow-sm">
+        <div class="card-body p-5">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h2 class="h3 fw-bold mb-2 text-primary">@DepartmentModel.Name</h2>
+                    <p class="lead text-muted mb-0">@DepartmentModel.Description</p>
+                </div>
+                <span class="badge bg-primary fs-6 px-3 py-2">ID: @DepartmentModel.Id</span>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card department-stat-mini border-0 text-center h-100">
+                        <div class="card-body p-4">
+                            <div class="department-stat-icon department-stat-icon-primary mb-3">
+                                <i class="bi bi-people fs-2"></i>
+                            </div>
+                            <div class="small text-muted text-uppercase fw-semibold mb-2">Total Staff</div>
+                            <div class="h3 fw-bold mb-0">@(DepartmentModel.Employees?.Count ?? 0)</div>
                         </div>
-                        <span class="badge bg-primary fs-6">ID: @DepartmentModel.Id</span>
                     </div>
-
-                    <hr />
-
-                    <div class="row g-4 mt-2">
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded text-center">
-                                <i class="bi bi-people fs-2 text-primary mb-2"></i>
-                                <div class="small text-muted text-uppercase fw-bold">Total Staff</div>
-                                <div class="fs-4 fw-bold">@DepartmentModel.Employees?.Count</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card department-stat-mini border-0 text-center h-100">
+                        <div class="card-body p-4">
+                            <div class="department-stat-icon department-stat-icon-success mb-3">
+                                <i class="bi bi-currency-dollar fs-2"></i>
                             </div>
+                            <div class="small text-muted text-uppercase fw-semibold mb-2">Annual Budget</div>
+                            <div class="h3 fw-bold mb-0">@((DepartmentModel.Budget ?? 0).ToString("C"))</div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded text-center">
-                                <i class="bi bi-currency-dollar fs-2 text-success mb-2"></i>
-                                <div class="small text-muted text-uppercase fw-bold">Annual Budget</div>
-                                <div class="fs-4 fw-bold">@((DepartmentModel.Budget ?? 0).ToString("C"))</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card department-stat-mini border-0 text-center h-100">
+                        <div class="card-body p-4">
+                            <div class="department-stat-icon department-stat-icon-info mb-3">
+                                <i class="bi bi-person-badge fs-2"></i>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="p-3 bg-light rounded text-center">
-                                <i class="bi bi-person-badge fs-2 text-info mb-2"></i>
-                                <div class="small text-muted text-uppercase fw-bold">Department Head</div>
-                                <div class="fs-4 fw-bold">@DepartmentModel.HeadOfDepartmentName</div>
-                            </div>
+                            <div class="small text-muted text-uppercase fw-semibold mb-2">Department Head</div>
+                            <div class="h3 fw-bold mb-0">@(DepartmentModel.HeadOfDepartmentName ?? "Unassigned")</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
 
 @code {
     private Department? DepartmentModel;

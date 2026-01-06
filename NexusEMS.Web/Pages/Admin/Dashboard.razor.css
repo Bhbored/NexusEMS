@@ -1,47 +1,256 @@
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+/* Dashboard Stat Cards */
+.dashboard-stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--bs-border-color) !important;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0.75rem 1.5rem var(--shadow-hover) !important;
+.dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-hover) !important;
 }
 
-.border-start {
-    border-width: 4px !important;
+.dashboard-stat-cyan {
+    color: var(--cyan);
 }
 
-.list-group-item {
+.dashboard-stat-blue {
+    color: var(--blue);
+}
+
+.dashboard-stat-orange {
+    color: var(--orange);
+}
+
+/* Icon Backgrounds */
+.dashboard-icon-bg {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+}
+
+.dashboard-icon-cyan {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+[data-core-theme="dark"] .dashboard-icon-cyan {
+    background-color: var(--cyan-900);
+    color: var(--cyan);
+}
+
+.dashboard-icon-green {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+[data-core-theme="dark"] .dashboard-icon-green {
+    background-color: rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.dashboard-icon-blue {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+[data-core-theme="dark"] .dashboard-icon-blue {
+    background-color: var(--blue-900);
+    color: var(--blue);
+}
+
+.dashboard-icon-orange {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+[data-core-theme="dark"] .dashboard-icon-orange {
+    background-color: var(--orange-900);
+    color: var(--orange);
+}
+
+/* View All Button */
+.dashboard-view-all-btn {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+    border: none;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
     transition: all 0.2s ease;
-    border-left: 3px solid transparent;
 }
 
-.list-group-item:hover {
-    border-left-color: var(--bs-primary);
-    padding-left: calc(1rem + 3px);
+.dashboard-view-all-btn:hover {
+    background-color: var(--cyan);
+    color: white;
 }
 
-.bg-light {
-    transition: all 0.2s ease;
+[data-core-theme="dark"] .dashboard-view-all-btn {
+    background-color: var(--cyan-900);
+    color: var(--cyan);
 }
 
-.list-group-item:hover .bg-light {
-    background-color: var(--bs-primary) !important;
-    color: white !important;
+[data-core-theme="dark"] .dashboard-view-all-btn:hover {
+    background-color: var(--cyan);
+    color: white;
 }
 
-.list-group-item:hover .bg-light i {
-    color: white !important;
+/* Empty State */
+.dashboard-empty-state {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 0.75rem;
+    background-color: var(--bs-body-bg);
+    min-height: 200px;
 }
 
-.progress {
-    transition: all 0.3s ease;
+[data-core-theme="dark"] .dashboard-empty-state {
+    background-color: rgba(31, 41, 55, 0.5);
 }
 
-.progress-bar {
+.dashboard-empty-icon {
+    width: 64px;
+    height: 64px;
+    background-color: var(--activity-icon-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Department Progress Bars */
+.dashboard-progress {
+    background-color: var(--progress-bg);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.dashboard-progress-bar {
+    background-color: var(--cyan);
+    border-radius: 9999px;
     transition: width 0.6s ease;
 }
 
-.card-header {
+.dashboard-dept-list > div:nth-child(1) .dashboard-progress-bar {
+    opacity: 1;
+}
+
+.dashboard-dept-list > div:nth-child(2) .dashboard-progress-bar {
+    opacity: 0.7;
+}
+
+.dashboard-dept-list > div:nth-child(3) .dashboard-progress-bar {
+    opacity: 0.5;
+}
+
+.dashboard-dept-list > div:nth-child(4) .dashboard-progress-bar {
+    opacity: 0.2;
+}
+
+/* Performer Cards */
+.dashboard-performer-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+.dashboard-performer-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--cyan) !important;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2) !important;
+}
+
+[data-core-theme="dark"] .dashboard-performer-card:hover {
+    border-color: var(--cyan) !important;
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.5) !important;
+}
+
+/* Avatar Colors */
+.dashboard-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.dashboard-avatar-cyan {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+[data-core-theme="dark"] .dashboard-avatar-cyan {
+    background-color: var(--cyan-900);
+    color: var(--cyan);
+}
+
+.dashboard-avatar-blue {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+[data-core-theme="dark"] .dashboard-avatar-blue {
+    background-color: var(--blue-900);
+    color: var(--blue);
+}
+
+.dashboard-avatar-indigo {
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+}
+
+[data-core-theme="dark"] .dashboard-avatar-indigo {
+    background-color: var(--indigo-900);
+    color: var(--indigo);
+}
+
+.dashboard-avatar-purple {
+    background-color: var(--purple-50);
+    color: var(--purple);
+}
+
+[data-core-theme="dark"] .dashboard-avatar-purple {
+    background-color: var(--purple-900);
+    color: var(--purple);
+}
+
+/* Performer Info */
+.dashboard-performer-info {
+    font-size: 0.75rem;
+}
+
+/* Status Badge */
+.dashboard-status-badge {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: none;
+    border-radius: 9999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.625rem;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+[data-core-theme="dark"] .dashboard-status-badge {
+    background-color: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.dashboard-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    display: inline-block;
+}
+
+[data-core-theme="dark"] .dashboard-status-dot {
+    background-color: #4ade80;
 }

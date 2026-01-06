@@ -1,54 +1,43 @@
-h3 {
-    font-weight: 700;
+/* Modern Employee Form Styles */
+.employee-form-card {
+    border-radius: 1rem;
 }
 
-.card {
-    transition: box-shadow 0.3s ease;
+.employee-form-btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-.card:hover {
-    box-shadow: 0 0.5rem 1rem var(--shadow-hover) !important;
+.employee-form-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
 .form-label {
-    font-weight: 600;
+    font-weight: 500;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: var(--bs-body-color);
 }
 
 .form-control,
 .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid var(--bs-border-color);
+    padding: 0.625rem 0.75rem;
     transition: all 0.2s ease;
 }
 
 .form-control:focus,
 .form-select:focus {
-    transform: translateY(-1px);
-    box-shadow: 0 0 0 0.2rem rgb(var(--bs-primary-rgb) / 0.15);
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1);
+    outline: none;
 }
 
-.btn {
-    transition: all 0.2s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 6px 20px rgb(var(--bs-primary-rgb) / 0.4);
-}
-
-.input-group-text {
-    background-color: var(--bs-tertiary-bg);
-    border-color: var(--bs-border-color);
+.form-control::placeholder {
     color: var(--text-muted);
-}
-
-.form-control:disabled {
-    background-color: var(--bs-tertiary-bg);
     opacity: 0.6;
 }
-
-.spinner-border {
-    transition: all 0.3s ease;
-}
-

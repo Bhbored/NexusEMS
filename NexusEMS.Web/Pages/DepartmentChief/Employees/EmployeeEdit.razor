@@ -1,94 +1,113 @@
 @page "/chief/employees/edit/{Id:int}"
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
+@using NexusEMS.Web.Services
+@using NexusEMS.Web.Tests
 @inject NavigationManager Navigation
+@inject AppStateService AppState
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Edit Team Member</h3>
-        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to Team</button>
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">Edit Team Member</h1>
+    <p class="text-muted mb-0">Update the team member information below.</p>
+</div>
+
+@if (Employee == null)
+{
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-5 text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
     </div>
-
-    @if (Employee == null)
-    {
-        <div class="spinner-border text-primary"></div>
-    }
-    else
-    {
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-4">
+}
+else
+{
+    <div class="card employee-form-card border-0 shadow-sm">
+        <div class="card-body p-5">
                 <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
                    
                     <div class="row g-3">
-                         <div class="col-md-6">
-                            <label class="form-label">First Name</label>
-                            <InputText class="form-control" @bind-Value="Employee.FirstName" />
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                            <InputText id="firstName" class="form-control" @bind-Value="Employee.FirstName" />
                             <ValidationMessage For="@(() => Employee.FirstName)" />
                         </div>
                         
                         <div class="col-md-6">
-                            <label class="form-label">Last Name</label>
-                             <InputText class="form-control" @bind-Value="Employee.LastName" />
+                            <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                            <InputText id="lastName" class="form-control" @bind-Value="Employee.LastName" />
                             <ValidationMessage For="@(() => Employee.LastName)" />
                         </div>
 
-                         <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                             <InputText class="form-control" @bind-Value="Employee.Email" />
-                             <ValidationMessage For="@(() => Employee.Email)" />
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <InputText id="email" class="form-control" @bind-Value="Employee.Email" />
+                            <ValidationMessage For="@(() => Employee.Email)" />
                         </div>
 
-                         <div class="col-md-6">
-                            <label class="form-label">Position</label>
-                             <InputText class="form-control" @bind-Value="Employee.Position" />
-                             <ValidationMessage For="@(() => Employee.Position)" />
+                        <div class="col-md-6">
+                            <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
+                            <InputText id="position" class="form-control" @bind-Value="Employee.Position" />
+                            <ValidationMessage For="@(() => Employee.Position)" />
                         </div>
                         
                         <!-- Read-only or Hidden sensitive fields -->
                         <div class="col-md-6">
-                             <label class="form-label text-muted">Department</label>
-                             <input type="text" class="form-control" value="@MyDepartmentName" disabled />
+                            <label for="department" class="form-label text-muted">Department</label>
+                            <input type="text" id="department" class="form-control" value="@MyDepartmentName" disabled />
                         </div>
-                         <div class="col-md-6">
-                             <label class="form-label text-muted">Salary</label>
-                             <div class="input-group">
-                                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                                 <input type="text" class="form-control" value="Confidential" disabled />
-                             </div>
-                             <small class="text-muted">Only Admin can edit salary</small>
+                        <div class="col-md-6">
+                            <label for="salary" class="form-label text-muted">Salary</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input type="text" id="salary" class="form-control" value="Confidential" disabled />
+                            </div>
+                            <small class="text-muted">Only Admin can edit salary</small>
                         </div>
 
-                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
-                             <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
-                             <button type="submit" class="btn btn-primary">Save Changes</button>
-                         </div>
+                        <div class="col-12 mt-5 d-flex justify-content-end gap-3">
+                            <button type="button" class="btn btn-outline-secondary employee-form-btn" @onclick="GoBack">Cancel</button>
+                            <button type="submit" class="btn btn-primary employee-form-btn">Save Changes</button>
+                        </div>
                     </div>
                 </EditForm>
             </div>
         </div>
     }
-</div>
 
 @code {
     [Parameter] public int Id { get; set; }
     private Employee Employee;
-    private string MyDepartmentName = "Engineering";
+    private string MyDepartmentName = string.Empty;
 
     protected override void OnInitialized()
     {
-        // Mock Load
-        Employee = new Employee 
-        { 
-            Id = Id, 
-            FirstName = "Alice", 
-            LastName = "Johnson", 
-            Email = "alice@nexus.com", 
-            Position = "Senior Dev", 
-            DepartmentId = 1,
-            HireDate = DateTime.Today.AddYears(-2),
-            Salary = 120000 // Should remain hidden/untouched
-        };
+        var employees = MockEmployees.GetEmployees();
+        var departments = MockDepartments.GetDepartments();
+        
+        Employee = employees.FirstOrDefault(e => e.Id == Id);
+        
+        if (Employee == null)
+        {
+            Employee = new Employee 
+            { 
+                Id = Id, 
+                FirstName = "Alice", 
+                LastName = "Johnson", 
+                Email = "alice@nexus.com", 
+                Position = "Senior Dev", 
+                DepartmentId = AppState.CurrentUser?.DepartmentId ?? 1,
+                HireDate = DateTime.Today.AddYears(-2),
+                Salary = 120000
+            };
+        }
+        
+        if (Employee?.DepartmentId !=null)
+        {
+            MyDepartmentName = departments.FirstOrDefault(d => d.Id == Employee.DepartmentId)?.Name ?? "Unknown";
+        }
     }
 
     private void HandleValidSubmit()

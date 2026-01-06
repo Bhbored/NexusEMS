@@ -25,6 +25,21 @@
   --light-dropdown-link-hover-bg: #f8f9fa;
   --light-info: #0dcaf0;
   --light-secondary: #6c757d;
+  --light-cyan: #06b6d4;
+  --light-cyan-50: #ecfeff;
+  --light-cyan-900: #164e63;
+  --light-orange: #fb923c;
+  --light-orange-50: #fff7ed;
+  --light-orange-900: #7c2d12;
+  --light-blue: #3b82f6;
+  --light-blue-50: #eff6ff;
+  --light-blue-900: #1e3a8a;
+  --light-indigo: #6366f1;
+  --light-indigo-50: #eef2ff;
+  --light-indigo-900: #312e81;
+  --light-purple: #a855f7;
+  --light-purple-50: #faf5ff;
+  --light-purple-900: #581c87;
 
   --dark-body-bg: #1a1d20;
   --dark-body-color: #f8f9fa;
@@ -55,6 +70,21 @@
   --dark-card-bg: #2b3035;
   --dark-primary: #4a90e2;
   --dark-primary-rgb: 74, 144, 226;
+  --dark-cyan: #06b6d4;
+  --dark-cyan-50: #164e63;
+  --dark-cyan-900: #ecfeff;
+  --dark-orange: #fb923c;
+  --dark-orange-50: #7c2d12;
+  --dark-orange-900: #fff7ed;
+  --dark-blue: #3b82f6;
+  --dark-blue-50: #1e3a8a;
+  --dark-blue-900: #eff6ff;
+  --dark-indigo: #6366f1;
+  --dark-indigo-50: #312e81;
+  --dark-indigo-900: #eef2ff;
+  --dark-purple: #a855f7;
+  --dark-purple-50: #581c87;
+  --dark-purple-900: #faf5ff;
 
   --light-shadow: rgba(0, 0, 0, 0.1);
   --light-shadow-hover: rgba(0, 0, 0, 0.15);
@@ -122,6 +152,21 @@
   --bs-tertiary-bg: var(--light-card-bg);
   --bs-tertiary-bg-rgb: 255, 255, 255;
   --sidebar-width: 280px;
+  --cyan: var(--light-cyan);
+  --cyan-50: var(--light-cyan-50);
+  --cyan-900: var(--light-cyan-900);
+  --orange: var(--light-orange);
+  --orange-50: var(--light-orange-50);
+  --orange-900: var(--light-orange-900);
+  --blue: var(--light-blue);
+  --blue-50: var(--light-blue-50);
+  --blue-900: var(--light-blue-900);
+  --indigo: var(--light-indigo);
+  --indigo-50: var(--light-indigo-50);
+  --indigo-900: var(--light-indigo-900);
+  --purple: var(--light-purple);
+  --purple-50: var(--light-purple-50);
+  --purple-900: var(--light-purple-900);
 
   --shadow: var(--light-shadow);
   --shadow-hover: var(--light-shadow-hover);
@@ -169,6 +214,21 @@
   --bs-body-bg-rgb: 248, 249, 250;
   --bs-tertiary-bg: var(--light-card-bg);
   --bs-tertiary-bg-rgb: 255, 255, 255;
+  --cyan: var(--light-cyan);
+  --cyan-50: var(--light-cyan-50);
+  --cyan-900: var(--light-cyan-900);
+  --orange: var(--light-orange);
+  --orange-50: var(--light-orange-50);
+  --orange-900: var(--light-orange-900);
+  --blue: var(--light-blue);
+  --blue-50: var(--light-blue-50);
+  --blue-900: var(--light-blue-900);
+  --indigo: var(--light-indigo);
+  --indigo-50: var(--light-indigo-50);
+  --indigo-900: var(--light-indigo-900);
+  --purple: var(--light-purple);
+  --purple-50: var(--light-purple-50);
+  --purple-900: var(--light-purple-900);
 
   --shadow: var(--light-shadow);
   --shadow-hover: var(--light-shadow-hover);
@@ -219,6 +279,21 @@
   --bs-body-bg-rgb: 26, 29, 32;
   --bs-tertiary-bg: var(--dark-card-bg);
   --bs-tertiary-bg-rgb: 43, 48, 53;
+  --cyan: var(--dark-cyan);
+  --cyan-50: var(--dark-cyan-50);
+  --cyan-900: var(--dark-cyan-900);
+  --orange: var(--dark-orange);
+  --orange-50: var(--dark-orange-50);
+  --orange-900: var(--dark-orange-900);
+  --blue: var(--dark-blue);
+  --blue-50: var(--dark-blue-50);
+  --blue-900: var(--dark-blue-900);
+  --indigo: var(--dark-indigo);
+  --indigo-50: var(--dark-indigo-50);
+  --indigo-900: var(--dark-indigo-900);
+  --purple: var(--dark-purple);
+  --purple-50: var(--dark-purple-50);
+  --purple-900: var(--dark-purple-900);
 
   --shadow: var(--dark-shadow);
   --shadow-hover: var(--dark-shadow-hover);
@@ -244,13 +319,7 @@ body {
   background-attachment: fixed;
   color: var(--bs-body-color);
   transition: background 0.3s ease, color 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
   min-height: 100vh;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Ubuntu', sans-serif;
-  font-weight: 700;
 }
 
 .card {
@@ -609,4 +678,65 @@ h6 {
 
 .table thead {
   border-radius: 0.75rem 0.75rem 0 0;
+}
+
+/* Dashboard Color Utilities */
+.text-cyan {
+  color: var(--cyan) !important;
+}
+
+.bg-cyan-50 {
+  background-color: var(--cyan-50) !important;
+}
+
+.bg-cyan-900 {
+  background-color: var(--cyan-900) !important;
+}
+
+.text-orange {
+  color: var(--orange) !important;
+}
+
+.bg-orange-50 {
+  background-color: var(--orange-50) !important;
+}
+
+.bg-orange-900 {
+  background-color: var(--orange-900) !important;
+}
+
+.text-blue {
+  color: var(--blue) !important;
+}
+
+.bg-blue-50 {
+  background-color: var(--blue-50) !important;
+}
+
+.bg-blue-900 {
+  background-color: var(--blue-900) !important;
+}
+
+.text-indigo {
+  color: var(--indigo) !important;
+}
+
+.bg-indigo-50 {
+  background-color: var(--indigo-50) !important;
+}
+
+.bg-indigo-900 {
+  background-color: var(--indigo-900) !important;
+}
+
+.text-purple {
+  color: var(--purple) !important;
+}
+
+.bg-purple-50 {
+  background-color: var(--purple-50) !important;
+}
+
+.bg-purple-900 {
+  background-color: var(--purple-900) !important;
 }
