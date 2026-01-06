@@ -1,0 +1,133 @@
+@typeparam TItem
+
+<div class="card shadow-sm">
+    <div class="card-header bg-body d-flex justify-content-between align-items-center py-3">
+        <h5 class="card-title m-0">@Title</h5>
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control form-control-sm" placeholder="Search..." @bind="SearchTerm" @bind:event="oninput" style="width: 200px;">
+            @if (OnAddClick.HasDelegate)
+            {
+                <button class="btn btn-primary btn-sm" @onclick="OnAddClick">
+                    <i class="bi bi-plus-lg me-1"></i> Add New
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    @HeaderContent
+                </tr>
+            </thead>
+            <tbody>
+                @if (Items == null)
+                {
+                    <tr>
+                        <td colspan="100" class="text-center py-5 text-muted">
+                            <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+                            Loading data...
+                        </td>
+                    </tr>
+                }
+                else if (!FilteredItems.Any())
+                {
+                    <tr>
+                        <td colspan="100" class="text-center py-5 text-muted">
+                             <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                             No records found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in FilteredItems)
+                    {
+                        <tr @onclick="() => OnRowClick.InvokeAsync(item)" style="@(OnRowClick.HasDelegate ? "cursor: pointer;" : "")">
+                            @RowTemplate(item)
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-body py-2">
+        <nav aria-label="Table navigation">
+            <ul class="pagination pagination-sm justify-content-end m-0">
+                <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => ChangePage(CurrentPage - 1)">Previous</button>
+                </li>
+                @for (int i = 1; i <= TotalPages; i++)
+                {
+                    var pageIndex = i;
+                    <li class="page-item @(CurrentPage == pageIndex ? "active" : "")">
+                         <button class="page-link" @onclick="() => ChangePage(pageIndex)">@pageIndex</button>
+                    </li>
+                }
+                <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                    <button class="page-link" @onclick="() => ChangePage(CurrentPage + 1)">Next</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Data Grid";
+    [Parameter] public IEnumerable<TItem> Items { get; set; }
+    [Parameter] public RenderFragment HeaderContent { get; set; }
+    [Parameter] public RenderFragment<TItem> RowTemplate { get; set; }
+    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
+    [Parameter] public EventCallback OnAddClick { get; set; }
+    [Parameter] public Func<TItem, string, bool> FilterStrategy { get; set; }
+
+    private string _searchTerm = "";
+    public string SearchTerm
+    {
+        get => _searchTerm;
+        set
+        {
+            _searchTerm = value;
+            CurrentPage = 1;
+        }
+    }
+
+    private int CurrentPage { get; set; } = 1;
+    private int PageSize { get; set; } = 10;
+
+    private IEnumerable<TItem> FilteredItems
+    {
+        get
+        {
+            if (Items == null) return Enumerable.Empty<TItem>();
+            
+            var query = Items;
+            if (!string.IsNullOrWhiteSpace(SearchTerm) && FilterStrategy != null)
+            {
+                query = query.Where(item => FilterStrategy(item, SearchTerm));
+            }
+            
+            return query.Skip((CurrentPage - 1) * PageSize).Take(PageSize);
+        }
+    }
+
+    private int TotalPages
+    {
+        get
+        {
+            if (Items == null) return 0;
+            var query = Items;
+            if (!string.IsNullOrWhiteSpace(SearchTerm) && FilterStrategy != null)
+            {
+                query = query.Where(item => FilterStrategy(item, SearchTerm));
+            }
+            return (int)Math.Ceiling((double)query.Count() / PageSize);
+        }
+    }
+
+    private void ChangePage(int page)
+    {
+        if (page < 1 || page > TotalPages) return;
+        CurrentPage = page;
+    }
+}

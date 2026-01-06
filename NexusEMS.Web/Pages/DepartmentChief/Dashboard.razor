@@ -1,0 +1,69 @@
+@page "/chief/dashboard"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.Employee
+
+<div class="row g-3 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-start border-primary border-4">
+            <div class="text-muted small text-uppercase fw-bold">My Team</div>
+            <div class="fs-2 fw-bold text-primary">@MyTeamCount</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-start border-success border-4">
+             <div class="text-muted small text-uppercase fw-bold">Active Members</div>
+             <div class="fs-2 fw-bold text-success">@ActiveTeamMembers</div>
+        </div>
+    </div>
+     <div class="col-md-4">
+        <div class="card p-3 shadow-sm border-start border-info border-4">
+             <div class="text-muted small text-uppercase fw-bold">Budget Utilization</div>
+             <div class="fs-2 fw-bold text-info">@BudgetUtilization%</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <h5 class="mb-3">Department Performance</h5>
+        <div class="card shadow-sm h-100">
+             <div class="card-body d-flex align-items-center justify-content-center text-muted" style="min-height: 300px;">
+                 <!-- Placeholder for a Chart -->
+                 <div class="text-center">
+                     <i class="bi bi-bar-chart-fill fs-1 mb-2"></i>
+                     <p>Performance Metrics Chart</p>
+                 </div>
+             </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <h5 class="mb-3">Recent Team Activity</h5>
+         <div class="list-group shadow-sm">
+             @foreach (var activity in TeamActivities)
+            {
+                <div class="list-group-item py-3">
+                    <div class="d-flex w-100 justify-content-between">
+                        <strong class="mb-1">@activity.Title</strong>
+                        <small class="text-muted">@activity.TimeAgo</small>
+                    </div>
+                    <small class="text-muted">@activity.Description</small>
+                </div>
+            }
+         </div>
+    </div>
+</div>
+
+@code {
+    private int MyTeamCount = 45;
+    private int ActiveTeamMembers = 42;
+    private int BudgetUtilization = 78;
+
+    private class Activity { public string Title { get; set; } public string Description { get; set; } public string TimeAgo { get; set; } }
+    private List<Activity> TeamActivities = new()
+    {
+        new Activity { Title = "New Hire", Description = "John Smith joined the team", TimeAgo = "2 days ago" },
+        new Activity { Title = "Leave Approved", Description = "Sarah's leave request approved", TimeAgo = "3 days ago" },
+        new Activity { Title = "Project Milestone", Description = "Q1 targets met", TimeAgo = "1 week ago" }
+    };
+}

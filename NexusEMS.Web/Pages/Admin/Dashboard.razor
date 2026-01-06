@@ -1,0 +1,147 @@
+@page "/admin/dashboard"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.Employee
+@using NexusEMS.Web.Components.Department
+
+<div class="row g-3 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm border-start border-primary border-4">
+            <div class="text-muted small text-uppercase fw-bold">Total Employees</div>
+            <div class="fs-2 fw-bold text-primary">@TotalEmployees</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm border-start border-success border-4">
+             <div class="text-muted small text-uppercase fw-bold">Active Employees</div>
+             <div class="fs-2 fw-bold text-success">@ActiveEmployees</div>
+        </div>
+    </div>
+     <div class="col-md-3">
+        <div class="card p-3 shadow-sm border-start border-info border-4">
+             <div class="text-muted small text-uppercase fw-bold">Departments</div>
+             <div class="fs-2 fw-bold text-info">@TotalDepartments</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+         <div class="card p-3 shadow-sm border-start border-warning border-4">
+             <div class="text-muted small text-uppercase fw-bold">New Hires</div>
+             <div class="fs-2 fw-bold text-warning">@NewHires</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Activity -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-body py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title m-0">Recent Activity</h5>
+                <button class="btn btn-sm btn-outline-secondary">View All</button>
+            </div>
+            <div class="list-group list-group-flush">
+                @foreach (var activity in RecentActivities)
+                {
+                    <div class="list-group-item d-flex align-items-center py-3">
+                        <div class="me-3">
+                            <span class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 40px; height: 40px;">
+                                <i class="bi @GetActivityIcon(activity.Type) fs-5 text-muted"></i>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-dark">@activity.Title</div>
+                            <small class="text-muted">@activity.TimeAgo</small>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Department Distribution -->
+    <div class="col-lg-4">
+         <div class="card shadow-sm h-100">
+            <div class="card-header bg-body py-3">
+                <h5 class="card-title m-0">Department Distribution</h5>
+            </div>
+            <div class="card-body">
+                @foreach (var dept in DepartmentStats)
+                {
+                     <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-bold small">@dept.Name</span>
+                            <span class="small text-muted">@dept.Count Employees</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: @(dept.Percentage)%" aria-valuenow="@dept.Percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+         </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h5 class="mb-3">Top Performers</h5>
+    </div>
+    @foreach(var emp in TopEmployees)
+    {
+        <div class="col-md-4 col-lg-3">
+            <EmployeeCard Employee="emp" />
+        </div>
+    }
+</div>
+
+
+@code {
+    // Stats
+    private int TotalEmployees = 142;
+    private int ActiveEmployees = 138;
+    private int TotalDepartments = 8;
+    private int NewHires = 12;
+
+    // Recent Activity Mock
+    private class ActivityItem { public string Title { get; set; } public string TimeAgo { get; set; } public string Type { get; set; } }
+    private List<ActivityItem> RecentActivities = new()
+    {
+        new ActivityItem { Title = "John Doe was added to Engineering", TimeAgo = "2 hours ago", Type = "plus" },
+        new ActivityItem { Title = "Q4 Marketing Budget Approved", TimeAgo = "5 hours ago", Type = "check" },
+        new ActivityItem { Title = "Sarah Smith updated profile", TimeAgo = "1 day ago", Type = "pencil" },
+        new ActivityItem { Title = "New Policy Document Uploaded", TimeAgo = "2 days ago", Type = "file" }
+    };
+
+    private string GetActivityIcon(string type) => type switch
+    {
+        "plus" => "bi-person-plus",
+        "check" => "bi-check-circle",
+        "pencil" => "bi-pencil",
+        "file" => "bi-file-earmark-text",
+        _ => "bi-activity"
+    };
+
+    // Department Stats Mock
+    private class DeptStat { public string Name { get; set; } public int Count { get; set; } public int Percentage { get; set; } }
+    private List<DeptStat> DepartmentStats = new()
+    {
+        new DeptStat { Name = "Engineering", Count = 45, Percentage = 32 },
+        new DeptStat { Name = "Sales", Count = 30, Percentage = 21 },
+        new DeptStat { Name = "Human Resources", Count = 12, Percentage = 8 },
+        new DeptStat { Name = "Marketing", Count = 25, Percentage = 18 },
+    };
+
+    // Top Performers Mock
+    private List<Employee> TopEmployees = new();
+
+    protected override void OnInitialized()
+    {
+        TopEmployees = new List<Employee>
+        {
+            new Employee { FirstName = "Alice", LastName = "Johnson", Position = "Senior Dev", Email = "alice@nexus.com", Department = new Department { Name = "Engineering" } },
+            new Employee { FirstName = "Bob", LastName = "Smith", Position = "Sales Lead", Email = "bob@nexus.com", Department = new Department { Name = "Sales" } },
+            new Employee { FirstName = "Charlie", LastName = "Brown", Position = "Product Owner", Email = "charlie@nexus.com", Department = new Department { Name = "Product" } },
+            new Employee { FirstName = "Diana", LastName = "Prince", Position = "HR Manager", Email = "diana@nexus.com", Department = new Department { Name = "HR" } }
+        };
+    }
+}

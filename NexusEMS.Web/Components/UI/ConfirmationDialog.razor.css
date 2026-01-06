@@ -1,0 +1,28 @@
+.modal {
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    box-shadow: 0 0.5rem 1rem var(--shadow-hover);
+}
+
+.btn-close {
+    transition: transform 0.2s ease;
+}
+
+.btn-close:hover {
+    transform: rotate(90deg);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-danger:hover {
+    box-shadow: 0 4px 12px rgba(var(--bs-danger-rgb), 0.4);
+}
+

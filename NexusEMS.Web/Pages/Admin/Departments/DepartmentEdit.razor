@@ -1,0 +1,100 @@
+@page "/admin/departments/edit/{Id:int}"
+@using NexusEMS.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Edit Department</h3>
+        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to List</button>
+    </div>
+
+    @if (Department == null)
+    {
+        <div class="d-flex justify-content-center">
+             <div class="spinner-border text-primary" role="status"></div>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <EditForm Model="@Department" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="name" class="form-label">Department Name <span class="text-danger">*</span></label>
+                            <InputText id="name" class="form-control" @bind-Value="Department.Name" />
+                            <ValidationMessage For="@(() => Department.Name)" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="description" class="form-label">Description</label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="Department.Description" rows="3" />
+                            <ValidationMessage For="@(() => Department.Description)" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="head" class="form-label">Head of Department</label>
+                             <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.HeadOfDepartmentId">
+                                <option value="">Select Chief...</option>
+                                @foreach (var emp in EligibleChiefs)
+                                {
+                                    <option value="@emp.Id">@emp.FirstName @emp.LastName</option>
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="budget" class="form-label">Budget</label>
+                            <InputNumber id="budget" class="form-control" @bind-Value="Department.Budget" />
+                        </div>
+
+                         <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                             <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
+                             <button type="submit" class="btn btn-primary">Save Changes</button>
+                         </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Department Department;
+    private List<Employee> EligibleChiefs = new();
+
+    protected override void OnInitialized()
+    {
+        // Mock Eligible Chiefs
+        EligibleChiefs = new List<Employee>
+        {
+            new Employee { Id = 10, FirstName = "Alice", LastName = "Chief" },
+            new Employee { Id = 11, FirstName = "Bob", LastName = "Boss" }
+        };
+
+        // Mock Department Load
+        Department = new Department 
+        { 
+            Id = Id, 
+            Name = "Engineering", 
+            Description = "Mock Description", 
+            Budget = 500000, 
+            HeadOfDepartmentId = 10 
+        };
+    }
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("Department saved!");
+        Navigation.NavigateTo("/admin/departments");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/admin/departments");
+    }
+}

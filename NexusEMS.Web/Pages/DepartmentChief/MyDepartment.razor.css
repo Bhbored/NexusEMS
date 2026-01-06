@@ -1,0 +1,46 @@
+h3 {
+    font-weight: 700;
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem var(--shadow-hover) !important;
+}
+
+.bg-light {
+    transition: all 0.3s ease;
+}
+
+.bg-light:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.bg-light i {
+    transition: transform 0.3s ease;
+}
+
+.bg-light:hover i {
+    transform: scale(1.2);
+}
+
+.badge {
+    transition: all 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+

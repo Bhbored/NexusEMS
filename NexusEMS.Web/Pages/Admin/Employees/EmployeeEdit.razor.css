@@ -1,0 +1,43 @@
+h3 {
+    font-weight: 700;
+}
+
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem var(--shadow-hover) !important;
+}
+
+.form-label {
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 0.2rem rgb(var(--bs-primary-rgb) / 0.15);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 20px rgb(var(--bs-primary-rgb) / 0.4);
+}
+
+.border-bottom {
+    border-color: var(--bs-border-color) !important;
+}
+

@@ -1,0 +1,25 @@
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px var(--shadow-hover) !important;
+}
+
+.border-primary {
+    transition: border-color 0.3s ease;
+}
+
+.card:hover .border-primary {
+    border-color: var(--bs-info) !important;
+}
+
+.btn-outline-primary {
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    transform: translateX(4px);
+}
+

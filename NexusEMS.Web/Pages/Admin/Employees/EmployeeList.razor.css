@@ -1,0 +1,24 @@
+h3 {
+    font-weight: 700;
+}
+
+.bg-light {
+    transition: all 0.2s ease;
+}
+
+.btn-sm {
+    transition: all 0.2s ease;
+}
+
+.btn-sm:hover {
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary:hover {
+    box-shadow: 0 4px 8px rgb(var(--bs-primary-rgb) / 0.3);
+}
+
+.btn-outline-danger:hover {
+    box-shadow: 0 4px 8px rgb(var(--bs-danger-rgb) / 0.3);
+}
+

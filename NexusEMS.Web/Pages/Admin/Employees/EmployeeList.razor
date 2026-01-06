@@ -1,0 +1,107 @@
+@page "/admin/employees"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.UI
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Employee Management</h3>
+</div>
+
+<DataGrid TItem="Employee" 
+          Items="@Employees" 
+          Title="All Employees"
+          OnAddClick="@(() => Navigation.NavigateTo("/admin/employees/create"))"
+          FilterStrategy="@FilterEmployees">
+    <HeaderContent>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Department</th>
+        <th>Position</th>
+        <th>Status</th>
+        <th class="text-end">Actions</th>
+    </HeaderContent>
+    <RowTemplate Context="employee">
+        <td>@employee.EmployeeCode</td>
+        <td>
+            <div class="d-flex align-items-center">
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <span class="small fw-bold">@employee.FirstName.FirstOrDefault()@employee.LastName.FirstOrDefault()</span>
+                </div>
+                <div>
+                    <div class="fw-bold">@employee.FirstName @employee.LastName</div>
+                    <div class="small text-muted">@employee.Email</div>
+                </div>
+            </div>
+        </td>
+        <td>@employee.Department?.Name</td>
+        <td>@employee.Position</td>
+        <td>
+            <span class="badge @(employee.IsActive ? "bg-success" : "bg-danger")">
+                @(employee.IsActive ? "Active" : "Inactive")
+            </span>
+        </td>
+        <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditEmployee(employee.Id)" title="Edit">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteEmployee(employee)" title="Delete">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </RowTemplate>
+</DataGrid>
+
+<ConfirmationDialog @ref="DeleteConfirmation" 
+                    Title="Delete Employee" 
+                    Message="@($"Are you sure you want to delete {EmployeeToDelete?.FirstName} {EmployeeToDelete?.LastName}?")"
+                    OnConfirmation="OnDeleteConfirmed" />
+
+@code {
+    private List<Employee> Employees = new();
+    private ConfirmationDialog DeleteConfirmation;
+    private Employee EmployeeToDelete;
+
+    protected override void OnInitialized()
+    {
+        // Mock Data
+        Employees = new List<Employee>
+        {
+            new Employee { Id = 1, EmployeeCode = "EMP001", FirstName = "Alice", LastName = "Johnson", Email = "alice@nexus.com", Position = "Senior Dev", Department = new Department { Name = "Engineering" }, IsActive = true },
+            new Employee { Id = 2, EmployeeCode = "EMP002", FirstName = "Bob", LastName = "Smith", Email = "bob@nexus.com", Position = "Sales Lead", Department = new Department { Name = "Sales" }, IsActive = true },
+            new Employee { Id = 3, EmployeeCode = "EMP003", FirstName = "Charlie", LastName = "Brown", Email = "charlie@nexus.com", Position = "Product Owner", Department = new Department { Name = "Product" }, IsActive = false },
+             new Employee { Id = 4, EmployeeCode = "EMP004", FirstName = "Diana", LastName = "Prince", Email = "diana@nexus.com", Position = "HR Manager", Department = new Department { Name = "HR" }, IsActive = true }
+        };
+    }
+
+    private bool FilterEmployees(Employee emp, string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm)) return true;
+        searchTerm = searchTerm.ToLower();
+        return emp.FirstName.ToLower().Contains(searchTerm) ||
+               emp.LastName.ToLower().Contains(searchTerm) ||
+               emp.Email.ToLower().Contains(searchTerm) ||
+               (emp.Department?.Name?.ToLower().Contains(searchTerm) ?? false) ||
+               emp.Position.ToLower().Contains(searchTerm);
+    }
+
+    private void EditEmployee(int id)
+    {
+        Navigation.NavigateTo($"/admin/employees/edit/{id}");
+    }
+
+    private void DeleteEmployee(Employee emp)
+    {
+        EmployeeToDelete = emp;
+        DeleteConfirmation.Show();
+    }
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && EmployeeToDelete != null)
+        {
+            Employees.Remove(EmployeeToDelete);
+            EmployeeToDelete = null;
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,25 @@
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem var(--shadow-hover) !important;
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    transform: scale(1.01);
+}
+

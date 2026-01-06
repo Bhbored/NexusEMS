@@ -1,0 +1,41 @@
+.card {
+    transition: box-shadow 0.3s ease;
+}
+
+.table {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    transform: scale(1.01);
+}
+
+.btn-sm {
+    transition: all 0.2s ease;
+}
+
+.btn-sm:hover {
+    transform: translateY(-2px);
+}
+
+.page-link {
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    transform: translateY(-2px);
+}
+
+.form-control-sm {
+    transition: all 0.2s ease;
+}
+
+.form-control-sm:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+}
+

@@ -1,0 +1,42 @@
+.card {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px var(--shadow-hover) !important;
+}
+
+.bg-primary {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .bg-primary {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.btn-outline-primary {
+    transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    transform: translateX(4px);
+}
+

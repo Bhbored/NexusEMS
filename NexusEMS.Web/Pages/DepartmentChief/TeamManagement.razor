@@ -1,0 +1,90 @@
+@page "/chief/team"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.UI
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Team Management</h3>
+</div>
+
+<DataGrid TItem="Employee" 
+          Items="@MyTeam" 
+          Title="@($"{MyDepartmentName} Employees")"
+          OnAddClick="@(() => Navigation.NavigateTo("/chief/employees/create"))"
+          FilterStrategy="@FilterTeam">
+    <HeaderContent>
+        <th>Name</th>
+        <th>Position</th>
+        <th>Email</th>
+        <th>Hire Date</th>
+        <th>Status</th>
+        <th class="text-end">Actions</th>
+    </HeaderContent>
+    <RowTemplate Context="employee">
+        <td>
+            <div class="fw-bold">@employee.FirstName @employee.LastName</div>
+        </td>
+        <td>@employee.Position</td>
+        <td>@employee.Email</td>
+        <td>@employee.HireDate.ToShortDateString()</td>
+        <td>
+            <span class="badge @(employee.IsActive ? "bg-success" : "bg-warning")">
+                @(employee.IsActive ? "Active" : "Inactive")
+            </span>
+        </td>
+        <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditEmployee(employee.Id)" title="Edit Details">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+            @if (employee.IsActive)
+            {
+                <button class="btn btn-sm btn-outline-warning" @onclick="() => ToggleStatus(employee)" title="Deactivate">
+                    <i class="bi bi-person-slash"></i>
+                </button>
+            }
+            else
+            {
+                 <button class="btn btn-sm btn-outline-success" @onclick="() => ToggleStatus(employee)" title="Activate">
+                    <i class="bi bi-person-check"></i>
+                </button>
+            }
+        </td>
+    </RowTemplate>
+</DataGrid>
+
+@code {
+    private List<Employee> MyTeam = new();
+    private string MyDepartmentName = "Engineering";
+
+    protected override void OnInitialized()
+    {
+        // Mock Data - Filtered for Engineering
+        MyTeam = new List<Employee>
+        {
+            new Employee { Id = 1, FirstName = "Alice", LastName = "Johnson", Email = "alice@nexus.com", Position = "Senior Dev", DepartmentId = 1, HireDate = DateTime.Today.AddYears(-2), IsActive = true },
+            new Employee { Id = 5, FirstName = "Evan", LastName = "Wright", Email = "evan@nexus.com", Position = "Junior Dev", DepartmentId = 1, HireDate = DateTime.Today.AddMonths(-3), IsActive = true },
+            new Employee { Id = 6, FirstName = "Fiona", LastName = "Green", Email = "fiona@nexus.com", Position = "QA Engineer", DepartmentId = 1, HireDate = DateTime.Today.AddYears(-1), IsActive = false }
+        };
+    }
+
+    private bool FilterTeam(Employee emp, string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm)) return true;
+        searchTerm = searchTerm.ToLower();
+        return emp.FirstName.ToLower().Contains(searchTerm) ||
+               emp.LastName.ToLower().Contains(searchTerm) ||
+               emp.Email.ToLower().Contains(searchTerm) ||
+               emp.Position.ToLower().Contains(searchTerm);
+    }
+
+    private void EditEmployee(int id)
+    {
+        Navigation.NavigateTo($"/chief/employees/edit/{id}");
+    }
+
+    private void ToggleStatus(Employee emp)
+    {
+        emp.IsActive = !emp.IsActive;
+        // Mock API call to save status
+    }
+}

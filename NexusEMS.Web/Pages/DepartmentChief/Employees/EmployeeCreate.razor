@@ -1,0 +1,89 @@
+@page "/chief/employees/create"
+@using NexusEMS.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Add Team Member</h3>
+        <button class="btn btn-outline-secondary" @onclick="GoBack">Back to Team</button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+               
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Adding new employee to <strong>@MyDepartmentName</strong> Department.
+                        </div>
+                    </div>
+
+                    <!-- Simplified form for Chief -->
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        <InputText class="form-control" @bind-Value="Employee.FirstName" />
+                        <ValidationMessage For="@(() => Employee.FirstName)" />
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                         <InputText class="form-control" @bind-Value="Employee.LastName" />
+                        <ValidationMessage For="@(() => Employee.LastName)" />
+                    </div>
+
+                     <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                         <InputText class="form-control" @bind-Value="Employee.Email" />
+                         <ValidationMessage For="@(() => Employee.Email)" />
+                    </div>
+
+                     <div class="col-md-6">
+                        <label class="form-label">Position</label>
+                         <InputText class="form-control" @bind-Value="Employee.Position" />
+                         <ValidationMessage For="@(() => Employee.Position)" />
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Hire Date</label>
+                         <InputDate class="form-control" @bind-Value="Employee.HireDate" />
+                         <ValidationMessage For="@(() => Employee.HireDate)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Employment Type</label>
+                         <InputSelect class="form-select text-dark" @bind-Value="Employee.EmploymentType">
+                            <option value="FullTime">Full Time</option>
+                            <option value="PartTime">Part Time</option>
+                            <option value="Contract">Contract</option>
+                        </InputSelect>
+                    </div>
+
+                     <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                         <button type="button" class="btn btn-secondary" @onclick="GoBack">Cancel</button>
+                         <button type="submit" class="btn btn-primary">Add Member</button>
+                     </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Employee Employee = new Employee { HireDate = DateTime.Today, DepartmentId = 1 }; // Pre-set Dept ID
+    private string MyDepartmentName = "Engineering";
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("Team member added!");
+        Navigation.NavigateTo("/chief/team");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/chief/team");
+    }
+}

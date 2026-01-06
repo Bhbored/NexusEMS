@@ -1,0 +1,97 @@
+@page "/admin/departments"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.UI
+@inject NavigationManager Navigation
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Department Management</h3>
+</div>
+
+<DataGrid TItem="Department" 
+          Items="@Departments" 
+          Title="All Departments"
+          OnAddClick="@(() => Navigation.NavigateTo("/admin/departments/create"))"
+          FilterStrategy="@FilterDepartments">
+    <HeaderContent>
+        <th>Department Name</th>
+        <th>Description</th>
+        <th>Head of Dept.</th>
+        <th>Employees</th>
+        <th>Budget</th>
+        <th class="text-end">Actions</th>
+    </HeaderContent>
+    <RowTemplate Context="dept">
+        <td class="fw-bold">@dept.Name</td>
+        <td>
+             <span class="d-inline-block text-truncate" style="max-width: 200px;">
+                @dept.Description
+            </span>
+        </td>
+        <td>@dept.HeadOfDepartmentName</td>
+        <td>
+            <span class="badge bg-secondary">@(dept.Employees?.Count ?? 0)</span>
+        </td>
+        <td>@(dept.Budget.HasValue ? dept.Budget.Value.ToString("C") : "-")</td>
+        <td class="text-end">
+            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => EditDepartment(dept.Id)" title="Edit">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteDepartment(dept)" title="Delete">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+    </RowTemplate>
+</DataGrid>
+
+<ConfirmationDialog @ref="DeleteConfirmation" 
+                    Title="Delete Department" 
+                    Message="@($"Are you sure you want to delete {DepartmentToDelete?.Name}?")"
+                    OnConfirmation="OnDeleteConfirmed" />
+
+@code {
+    private List<Department> Departments = new();
+    private ConfirmationDialog DeleteConfirmation;
+    private Department DepartmentToDelete;
+
+    protected override void OnInitialized()
+    {
+        // Mock Data
+        Departments = new List<Department>
+        {
+            new Department { Id = 1, Name = "Engineering", Description = "Software Development & QA", HeadOfDepartmentName = "Alice Johnson", Employees = new List<Employee>(new Employee[45]), Budget = 500000 },
+            new Department { Id = 2, Name = "Sales", Description = "Global Sales Team", HeadOfDepartmentName = "Bob Smith", Employees = new List<Employee>(new Employee[30]), Budget = 300000 },
+            new Department { Id = 3, Name = "Human Resources", Description = "Recruiting & Employee Relations", HeadOfDepartmentName = "Diana Prince", Employees = new List<Employee>(new Employee[12]), Budget = 150000 },
+            new Department { Id = 4, Name = "Marketing", Description = "Brand & Communications", HeadOfDepartmentName = "Charlie Brown", Employees = new List<Employee>(new Employee[25]), Budget = 250000 }
+        };
+    }
+
+    private bool FilterDepartments(Department dept, string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm)) return true;
+        searchTerm = searchTerm.ToLower();
+        return dept.Name.ToLower().Contains(searchTerm) ||
+               (dept.Description?.ToLower().Contains(searchTerm) ?? false) ||
+               (dept.HeadOfDepartmentName?.ToLower().Contains(searchTerm) ?? false);
+    }
+
+    private void EditDepartment(int id)
+    {
+        Navigation.NavigateTo($"/admin/departments/edit/{id}");
+    }
+
+    private void DeleteDepartment(Department dept)
+    {
+        DepartmentToDelete = dept;
+        DeleteConfirmation.Show();
+    }
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && DepartmentToDelete != null)
+        {
+            Departments.Remove(DepartmentToDelete);
+            DepartmentToDelete = null;
+            StateHasChanged();
+        }
+    }
+}

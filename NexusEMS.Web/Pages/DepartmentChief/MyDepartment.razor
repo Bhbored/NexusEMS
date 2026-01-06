@@ -1,0 +1,67 @@
+@page "/chief/my-department"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Web.Components.Department
+
+<div class="container-fluid">
+    <h3 class="mb-4">My Department</h3>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h2 class="text-primary fw-bold mb-1">@DepartmentModel.Name</h2>
+                             <p class="lead text-muted">@DepartmentModel.Description</p>
+                        </div>
+                        <span class="badge bg-primary fs-6">ID: @DepartmentModel.Id</span>
+                    </div>
+                    
+                    <hr />
+
+                    <div class="row g-4 mt-2">
+                         <div class="col-md-3">
+                            <div class="p-3 bg-light rounded text-center">
+                                <i class="bi bi-people fs-2 text-primary mb-2"></i>
+                                <div class="small text-muted text-uppercase fw-bold">Total Staff</div>
+                                <div class="fs-4 fw-bold">@DepartmentModel.Employees?.Count</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 bg-light rounded text-center">
+                                <i class="bi bi-currency-dollar fs-2 text-success mb-2"></i>
+                                <div class="small text-muted text-uppercase fw-bold">Annual Budget</div>
+                                <div class="fs-4 fw-bold">@((DepartmentModel.Budget ?? 0).ToString("C"))</div>
+                            </div>
+                        </div>
+                         <div class="col-md-3">
+                            <div class="p-3 bg-light rounded text-center">
+                                <i class="bi bi-person-badge fs-2 text-info mb-2"></i>
+                                <div class="small text-muted text-uppercase fw-bold">Department Head</div>
+                                <div class="fs-4 fw-bold">@DepartmentModel.HeadOfDepartmentName</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Department DepartmentModel;
+
+    protected override void OnInitialized()
+    {
+        // Mock Data for current user's department
+        DepartmentModel = new Department 
+        { 
+            Id = 1, 
+            Name = "Engineering", 
+            Description = "Responsible for all software development activities and QA.", 
+            Budget = 1200000,
+            HeadOfDepartmentName = "You (Admin)",
+            Employees = new List<Employee>(new Employee[45])
+        };
+    }
+}

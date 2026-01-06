@@ -37,7 +37,11 @@ h3 {
     box-shadow: 0 6px 20px rgb(var(--bs-primary-rgb) / 0.4);
 }
 
-.border-bottom {
-    border-color: var(--bs-border-color) !important;
+.alert {
+    transition: all 0.2s ease;
+}
+
+.alert:hover {
+    transform: translateX(4px);
 }
 

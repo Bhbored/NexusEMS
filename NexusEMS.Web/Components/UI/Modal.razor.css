@@ -1,0 +1,33 @@
+.modal {
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    box-shadow: 0 0.5rem 1rem var(--shadow-hover);
+    transition: all 0.3s ease;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.btn-close {
+    transition: transform 0.2s ease;
+}
+
+.btn-close:hover {
+    transform: rotate(90deg);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+

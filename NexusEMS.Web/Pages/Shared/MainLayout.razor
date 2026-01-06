@@ -1,0 +1,75 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+
+<div class="d-flex" style="height: 100vh; overflow: hidden;">
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column p-3" style="width: var(--sidebar-width); transition: background-color 0.3s;">
+        <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+            <span class="fs-4 fw-bold text-primary">Nexus EMS</span>
+        </a>
+        <hr class="text-secondary">
+        
+        <NavMenu />
+        
+        <hr class="mt-auto text-secondary">
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-secondary" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle fs-5 me-2"></i>
+                <strong>User</strong>
+            </a>
+            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 d-flex flex-column" style="overflow-y: auto;">
+        <!-- Top Bar -->
+        <header class="p-3 border-bottom d-flex align-items-center justify-content-between bg-body">
+            <h5 class="m-0 text-muted">Dashboard</h5> <!-- Dynamic title ideally -->
+            
+            <div class="d-flex align-items-center gap-3">
+                 <button class="btn btn-outline-secondary d-flex align-items-center gap-2" @onclick="ToggleTheme">
+                    @if (isDarkMode)
+                    {
+                        <i class="bi bi-sun-fill text-warning"></i> <span>Light</span>
+                    }
+                    else
+                    {
+                        <i class="bi bi-moon-stars-fill text-primary"></i> <span>Dark</span>
+                    }
+                 </button>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="p-4 flex-grow-1 bg-body-tertiary">
+            <div class="container-fluid">
+                @Body
+            </div>
+        </main>
+    </div>
+</div>
+
+@code {
+    private bool isDarkMode = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var currentTheme = await JSRuntime.InvokeAsync<string>("getTheme");
+            isDarkMode = currentTheme == "dark";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        await JSRuntime.InvokeVoidAsync("toggleTheme");
+        isDarkMode = !isDarkMode;
+    }
+}
