@@ -3,7 +3,7 @@
 @using NexusEMS.Web.Components.Department
 @using NexusEMS.Web.Services
 @using NexusEMS.Web.Tests
-@inject AppStateService AppState
+@inject AuthService AuthService
 
 <div class="mb-6">
     <h1 class="h2 fw-bold mb-1">My Department</h1>
@@ -78,12 +78,12 @@ else
 
     protected override void OnInitialized()
     {
-        if (AppState.CurrentUser?.DepartmentId.HasValue == true)
+        if (AuthService.CurrentUser?.DepartmentId.HasValue == true)
         {
             var departments = MockDepartments.GetDepartments();
             var employees = MockEmployees.GetEmployees();
 
-            DepartmentModel = departments.FirstOrDefault(d => d.Id == AppState.CurrentUser.DepartmentId);
+            DepartmentModel = departments.FirstOrDefault(d => d.Id == AuthService.CurrentUser.DepartmentId);
             if (DepartmentModel != null)
             {
                 DepartmentModel.Employees = employees.Where(e => e.DepartmentId == DepartmentModel.Id).ToList();

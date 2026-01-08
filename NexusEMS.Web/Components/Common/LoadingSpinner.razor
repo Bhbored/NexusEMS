@@ -1,0 +1,101 @@
+@if (IsLoading)
+{
+    <div class="@GetContainerClass()">
+        <div class="spinner-border @GetSpinnerSize() @GetSpinnerColor()" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="mt-2 @GetTextColor()">@Message</div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsLoading { get; set; } = true;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public SpinnerSize Size { get; set; } = SpinnerSize.Medium;
+
+    [Parameter]
+    public SpinnerColor Color { get; set; } = SpinnerColor.Primary;
+
+    [Parameter]
+    public bool Centered { get; set; } = true;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    private string GetContainerClass()
+    {
+        var classes = new List<string>();
+        
+        if (Centered)
+            classes.Add("d-flex flex-column justify-content-center align-items-center");
+        
+        if (!string.IsNullOrEmpty(CssClass))
+            classes.Add(CssClass);
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetSpinnerSize()
+    {
+        return Size switch
+        {
+            SpinnerSize.Small => "spinner-border-sm",
+            SpinnerSize.Medium => "",
+            SpinnerSize.Large => "spinner-border-lg",
+            _ => ""
+        };
+    }
+
+    private string GetSpinnerColor()
+    {
+        return Color switch
+        {
+            SpinnerColor.Primary => "text-primary",
+            SpinnerColor.Secondary => "text-secondary",
+            SpinnerColor.Success => "text-success",
+            SpinnerColor.Danger => "text-danger",
+            SpinnerColor.Warning => "text-warning",
+            SpinnerColor.Info => "text-info",
+            _ => "text-primary"
+        };
+    }
+
+    private string GetTextColor()
+    {
+        return Color switch
+        {
+            SpinnerColor.Primary => "text-primary",
+            SpinnerColor.Secondary => "text-secondary",
+            SpinnerColor.Success => "text-success",
+            SpinnerColor.Danger => "text-danger",
+            SpinnerColor.Warning => "text-warning",
+            SpinnerColor.Info => "text-info",
+            _ => "text-muted"
+        };
+    }
+
+    public enum SpinnerSize
+    {
+        Small,
+        Medium,
+        Large
+    }
+
+    public enum SpinnerColor
+    {
+        Primary,
+        Secondary,
+        Success,
+        Danger,
+        Warning,
+        Info
+    }
+}

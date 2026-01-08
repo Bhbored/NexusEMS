@@ -1,0 +1,56 @@
+@*Reusable Top Bar / Header Component*@
+
+<header class="sticky-top p-3 border-bottom d-flex align-items-center justify-content-between bg-body @CssClass">
+    <div class="d-flex align-items-center gap-3">
+        @if (ShowMobileMenuButton)
+        {
+            <!-- Mobile Menu Button -->
+            <button class="btn btn-link d-md-none p-2 text-muted" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#mobileNav" aria-controls="mobileNav">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+        }
+        @if (!string.IsNullOrEmpty(PageTitle))
+        {
+            <h5 class="m-0 text-muted">@PageTitle</h5>
+        }
+        @if (LeftContent != null)
+        {
+            @LeftContent
+        }
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        @if (CenterContent != null)
+        {
+            @CenterContent
+        }
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        @if (RightContent != null)
+        {
+            @RightContent
+        }
+    </div>
+</header>
+
+@code {
+    [Parameter]
+    public string? PageTitle { get; set; }
+
+    [Parameter]
+    public bool ShowMobileMenuButton { get; set; } = true;
+
+    [Parameter]
+    public RenderFragment? LeftContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? CenterContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? RightContent { get; set; }
+
+    [Parameter]
+    public string? CssClass { get; set; }
+}

@@ -1,0 +1,66 @@
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert @GetAlertClass() d-flex align-items-center gap-2 @CssClass" role="alert">
+        <i class="bi @GetIcon()"></i>
+        <span>@Message</span>
+        @if (Dismissible)
+        {
+            <button type="button" class="btn-close ms-auto" @onclick="Dismiss"></button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+
+    [Parameter]
+    public ErrorType Type { get; set; } = ErrorType.Danger;
+
+    [Parameter]
+    public bool Dismissible { get; set; } = false;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    [Parameter]
+    public EventCallback OnDismissed { get; set; }
+
+    private void Dismiss()
+    {
+        Message = null;
+        OnDismissed.InvokeAsync();
+    }
+
+    private string GetAlertClass()
+    {
+        return Type switch
+        {
+            ErrorType.Success => "alert-success",
+            ErrorType.Info => "alert-info",
+            ErrorType.Warning => "alert-warning",
+            ErrorType.Danger => "alert-danger",
+            _ => "alert-danger"
+        };
+    }
+
+    private string GetIcon()
+    {
+        return Type switch
+        {
+            ErrorType.Success => "bi-check-circle-fill",
+            ErrorType.Info => "bi-info-circle-fill",
+            ErrorType.Warning => "bi-exclamation-triangle-fill",
+            ErrorType.Danger => "bi-exclamation-triangle-fill",
+            _ => "bi-exclamation-triangle-fill"
+        };
+    }
+
+    public enum ErrorType
+    {
+        Success,
+        Info,
+        Warning,
+        Danger
+    }
+}

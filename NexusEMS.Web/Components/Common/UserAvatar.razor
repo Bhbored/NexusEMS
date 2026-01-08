@@ -1,0 +1,137 @@
+@*Reusable User Avatar Component*@
+
+<div class="@GetAvatarClass()" title="@FullName" @onclick="OnClick">
+    @if (!string.IsNullOrEmpty(ImageUrl))
+    {
+        <img src="@ImageUrl" alt="@FullName" class="w-100 h-100 object-fit-cover" />
+    }
+    else
+    {
+        <span class="@GetTextSizeClass()">@GetInitials()</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? FirstName { get; set; }
+
+    [Parameter]
+    public string? LastName { get; set; }
+
+    [Parameter]
+    public string? FullName { get; set; }
+
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    [Parameter]
+    public AvatarSize Size { get; set; } = AvatarSize.Medium;
+
+    [Parameter]
+    public AvatarColor Color { get; set; } = AvatarColor.Indigo;
+
+    [Parameter]
+    public bool Clickable { get; set; } = false;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string GetAvatarClass()
+    {
+        var classes = new List<string> { "user-avatar" };
+        
+        classes.Add(GetSizeClass());
+        classes.Add(GetColorClass());
+        
+        if (Clickable && OnClick.HasDelegate)
+            classes.Add("cursor-pointer");
+
+        if (!string.IsNullOrEmpty(CssClass))
+            classes.Add(CssClass);
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetSizeClass()
+    {
+        return Size switch
+        {
+            AvatarSize.ExtraSmall => "user-avatar-xs",
+            AvatarSize.Small => "user-avatar-sm",
+            AvatarSize.Medium => "user-avatar-md",
+            AvatarSize.Large => "user-avatar-lg",
+            AvatarSize.ExtraLarge => "user-avatar-xl",
+            _ => "user-avatar-md"
+        };
+    }
+
+    private string GetColorClass()
+    {
+        return Color switch
+        {
+            AvatarColor.Indigo => "user-avatar-indigo",
+            AvatarColor.Blue => "user-avatar-blue",
+            AvatarColor.Orange => "user-avatar-orange",
+            AvatarColor.Pink => "user-avatar-pink",
+            AvatarColor.Green => "user-avatar-green",
+            AvatarColor.Purple => "user-avatar-purple",
+            _ => "user-avatar-indigo"
+        };
+    }
+
+    private string GetTextSizeClass()
+    {
+        return Size switch
+        {
+            AvatarSize.ExtraSmall => "small",
+            AvatarSize.Small => "small",
+            AvatarSize.Medium => "",
+            AvatarSize.Large => "fs-5",
+            AvatarSize.ExtraLarge => "fs-4",
+            _ => ""
+        };
+    }
+
+    private string GetInitials()
+    {
+        if (!string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName))
+        {
+            return $"{FirstName[0]}{LastName[0]}".ToUpper();
+        }
+        
+        if (!string.IsNullOrEmpty(FullName))
+        {
+            var parts = FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2)
+                return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+            if (parts.Length == 1 && parts[0].Length >= 2)
+                return parts[0].Substring(0, 2).ToUpper();
+            if (parts.Length == 1)
+                return parts[0][0].ToString().ToUpper();
+        }
+
+        return "?";
+    }
+
+    public enum AvatarSize
+    {
+        ExtraSmall,
+        Small,
+        Medium,
+        Large,
+        ExtraLarge
+    }
+
+    public enum AvatarColor
+    {
+        Indigo,
+        Blue,
+        Orange,
+        Pink,
+        Green,
+        Purple
+    }
+}

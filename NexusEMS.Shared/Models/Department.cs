@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NexusEMS.Shared.Models;
 
-public class Department
+public class Department : EntityBase
 {
-    public int Id { get; set; }
-
     [Required]
     [StringLength(100)]
     public string Name { get; set; } = string.Empty;
@@ -13,14 +11,22 @@ public class Department
     [StringLength(500)]
     public string? Description { get; set; }
 
-    public int? HeadOfDepartmentId { get; set; }
-    public string? HeadOfDepartmentName { get; set; }
+    [MaxLength(30)]
+    public string? Code { get; set; }
 
+    [Required]
+    public Guid BranchId { get; set; }
+    public Guid? ChiefUserId { get; set; }
     public decimal? Budget { get; set; }
+    public bool IsSystemDepartment { get; set; } = false;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-    // Navigation property
-    public List<Employee>? Employees { get; set; }
+    //Navigation Property
+    public Branch? Branch { get; set; }
+    public User? Chief { get; set; }
+    public ICollection<Employee> Employees { get; set; } = [];
+    public ICollection<User> Users { get; set; } = [];
+    public ICollection<WorkSchedule> WorkSchedules { get; set; } = [];
+    public ICollection<ComplaintCase> ComplaintCases { get; set; } = [];
+    public ICollection<AuditLog> AuditLogs { get; set; } = [];
+    public ICollection<SalaryConfiguration> SalaryConfigurations { get; set; } = [];
 }

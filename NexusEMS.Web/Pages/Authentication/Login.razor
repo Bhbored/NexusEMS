@@ -3,13 +3,12 @@
 @using NexusEMS.Shared.Models
 @using NexusEMS.Shared.Enums
 @using NexusEMS.Web.Services
-@using NexusEMS.Web.Pages.Shared
 @using NexusEMS.Web.Components.Common
+@using NexusEMS.Web.Layouts
 @inject AuthService AuthService
-@inject AppStateService AppState
 @inject NavigationManager Navigation
 
-@if (AppState.IsAuthenticated)
+@if (AuthService.IsAuthenticated)
 {
     <RedirectToDashboard />
 }
@@ -227,7 +226,6 @@
 
         if (loggedInUser != null)
         {
-            AppState.CurrentUser = loggedInUser;
             showMobileLogin = false;
 
             if (loggedInUser.Role == UserRole.Admin)

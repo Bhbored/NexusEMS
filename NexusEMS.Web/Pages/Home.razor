@@ -1,18 +1,20 @@
 @page "/"
 @layout EmptyLayout
+@using NexusEMS.Shared.Enums
+@using NexusEMS.Web.Layouts
 @using NexusEMS.Web.Services
-@using NexusEMS.Web.Pages.Shared
-@inject AppStateService AppState
+@inject AuthService AuthService
 @inject NavigationManager Navigation
 
 @code {
     protected override void OnInitialized()
     {
-        if (AppState.IsAuthenticated)
+        if (AuthService.IsAuthenticated)
         {
-            if (AppState.IsAdmin)
+            var role = AuthService.GetUserRole();
+            if (role == UserRole.Admin)
                 Navigation.NavigateTo("/admin/dashboard");
-            else if (AppState.IsDepartmentChief)
+            else if (role == UserRole.DepartmentChief)
                 Navigation.NavigateTo("/chief/dashboard");
             else
                 Navigation.NavigateTo("/login");

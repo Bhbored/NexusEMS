@@ -1,9 +1,11 @@
 @page "/chief/dashboard"
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.Employee
 @using NexusEMS.Web.Services
 @using NexusEMS.Web.Tests
-@inject AppStateService AppState
+@inject AuthService AuthService
+@inject TestDataService TestData
 
 <div class="row g-4 mb-4">
     <!-- Stats Cards -->
@@ -56,7 +58,7 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center small text-muted">
-                    <span>@(myDepartment?.Budget.HasValue == true ? $"${teamMembers.Sum(e => e.Salary ?? 0):N0} / ${myDepartment.Budget:N0}" : "No budget set")</span>
+                    <span>@(myDepartment?.Budget.HasValue == true ? $"${teamMembers.Sum(e => e.CurrentNetSalary):N0} / ${myDepartment.Budget:N0}" : "No budget set")</span>
                 </div>
             </div>
         </div>
@@ -123,22 +125,22 @@
     private List<Employee> teamMembers = new();
     private Department? myDepartment;
     private List<Activity> TeamActivities = new();
-    
+
     private int MyTeamCount => teamMembers.Count;
-    private int ActiveTeamMembers => teamMembers.Count(e => e.IsActive);
-    private int BudgetUtilization => myDepartment?.Budget > 0 ? (int)((teamMembers.Sum(e => e.Salary ?? 0) / (decimal)myDepartment.Budget) * 100) : 0;
+    private int ActiveTeamMembers => teamMembers.Count(e => e.EmploymentStatus == EmploymentStatus.Active);
+    private int BudgetUtilization => myDepartment?.Budget > 0 ? (int)((teamMembers.Sum(e => e.CurrentNetSalary) / (decimal)myDepartment.Budget) * 100) : 0;
 
     private class Activity { public string Title { get; set; } = string.Empty; public string Description { get; set; } = string.Empty; public string TimeAgo { get; set; } = string.Empty; }
 
     protected override void OnInitialized()
     {
-        var employees = MockEmployees.GetEmployees();
-        var departments = MockDepartments.GetDepartments();
-        
-        if (AppState.CurrentUser?.DepartmentId.HasValue == true)
+        var employees = TestData.GetEmployees();
+        var departments = TestData.GetDepartments();
+
+        if (AuthService.CurrentUser?.DepartmentId.HasValue == true)
         {
-            myDepartment = departments.FirstOrDefault(d => d.Id == AppState.CurrentUser.DepartmentId);
-            teamMembers = employees.Where(e => e.DepartmentId == AppState.CurrentUser.DepartmentId).ToList();
+            myDepartment = departments.FirstOrDefault(d => d.Id == AuthService.CurrentUser.DepartmentId);
+            teamMembers = employees.Where(e => e.DepartmentId == AuthService.CurrentUser.DepartmentId).ToList();
         }
     }
 }

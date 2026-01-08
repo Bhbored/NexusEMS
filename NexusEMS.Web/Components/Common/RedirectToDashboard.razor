@@ -1,18 +1,20 @@
 @using Microsoft.AspNetCore.Components
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Web.Services
 @inject NavigationManager Navigation
-@inject AppStateService AppState
+@inject AuthService AuthService
 
 @code {
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
+            var role = AuthService.GetUserRole();
             try
             {
-                if (AppState?.IsAdmin == true)
+                if (role == UserRole.Admin)
                     Navigation.NavigateTo("/admin/dashboard", forceLoad: false);
-                else if (AppState?.IsDepartmentChief == true)
+                else if (role == UserRole.DepartmentChief)
                     Navigation.NavigateTo("/chief/dashboard", forceLoad: false);
                 else
                     Navigation.NavigateTo("/login", forceLoad: false);

@@ -1,7 +1,10 @@
 @page "/admin/dashboard"
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.Employee
 @using NexusEMS.Web.Components.Department
+@inject TestDataService TestData
+@using NexusEMS.Web.Services
 @using NexusEMS.Web.Tests
 
 <div class="row g-4 mb-4">
@@ -171,7 +174,7 @@
     private List<Employee> topEmployees = new();
 
     private int TotalEmployees => employees.Count;
-    private int ActiveEmployees => employees.Count(e => e.IsActive);
+    private int ActiveEmployees => employees.Count(e => e.EmploymentStatus == EmploymentStatus.Active);
     private int TotalDepartments => departments.Count;
     private int NewHires => employees.Count(e => e.HireDate >= DateTime.UtcNow.AddMonths(-1));
 
@@ -202,8 +205,8 @@
 
     protected override void OnInitialized()
     {
-        employees = MockEmployees.GetEmployees();
-        departments = MockDepartments.GetDepartments();
+        employees = TestData.GetEmployees();
+        departments =  TestData.GetDepartments();
         topEmployees = employees.Take(4).ToList();
 
         var totalEmpCount = employees.Count;

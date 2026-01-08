@@ -1,0 +1,104 @@
+@page "/chief/employees/create"
+@using NexusEMS.Shared.Models
+@using System.ComponentModel.DataAnnotations
+@using NexusEMS.Web.Services
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+
+<div class="mb-6">
+    <h1 class="h2 fw-bold mb-1">Add Team Member</h1>
+    <p class="text-muted mb-0">Fill in the team member information below.</p>
+</div>
+
+<div class="card employee-form-card border-0 shadow-sm">
+    <div class="card-body p-5">
+        <EditForm Model="@Employee" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span>Adding new employee to <strong>@MyDepartmentName</strong> Department.</span>
+                    </div>
+                </div>
+
+                <!-- Simplified form for Chief -->
+                <div class="col-md-6">
+                    <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+                    <InputText id="firstName" class="form-control" @bind-Value="Employee.FirstName"
+                        placeholder="John" />
+                    <ValidationMessage For="@(() => Employee.FirstName)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <InputText id="lastName" class="form-control" @bind-Value="Employee.LastName" placeholder="Doe" />
+                    <ValidationMessage For="@(() => Employee.LastName)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <InputText id="email" class="form-control" @bind-Value="Employee.Email"
+                        placeholder="john.doe@nexus.com" />
+                    <ValidationMessage For="@(() => Employee.Email)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
+                    <InputText id="position" class="form-control" @bind-Value="Employee.Position!.Title"
+                        placeholder="Software Engineer" />
+                    <ValidationMessage For="@(() => Employee.Position)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="hireDate" class="form-label">Hire Date <span class="text-danger">*</span></label>
+                    <InputDate id="hireDate" class="form-control" @bind-Value="Employee.HireDate" />
+                    <ValidationMessage For="@(() => Employee.HireDate)" />
+                </div>
+
+                <div class="col-md-6">
+                    <label for="empType" class="form-label">Employment Type</label>
+                    <InputSelect id="empType" class="form-select text-dark" @bind-Value="Employee.ContractType">
+                        <option value="FullTime">Full Time</option>
+                        <option value="PartTime">Part Time</option>
+                        <option value="Contract">Contract</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-12 mt-5 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn btn-outline-secondary employee-form-btn"
+                        @onclick="GoBack">Cancel</button>
+                    <button type="submit" class="btn btn-primary employee-form-btn">Add Member</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private Employee Employee = new Employee { HireDate = DateTime.Today };
+    private string MyDepartmentName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.CurrentUser?.DepartmentId.HasValue == true)
+        {
+            Employee.DepartmentId = AuthService.CurrentUser.DepartmentId.Value;
+            var departments = TestData.GetDepartments();
+            MyDepartmentName = departments.FirstOrDefault(d => d.Id == AuthService.CurrentUser.DepartmentId)?.Name ?? "Unknown";
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine("Team member added!");
+        Navigation.NavigateTo("/chief/team");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/chief/team");
+    }
+}

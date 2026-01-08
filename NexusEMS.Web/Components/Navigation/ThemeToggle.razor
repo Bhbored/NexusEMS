@@ -1,0 +1,50 @@
+@*Reusable Theme Toggle Button*@
+@inject IJSRuntime JSRuntime
+
+<button class="btn @ButtonClass d-flex align-items-center gap-2" @onclick="ToggleTheme" title="Toggle Theme">
+    @if (IsDarkMode)
+    {
+        <i class="bi bi-sun-fill text-warning"></i> 
+        @if (ShowLabel)
+        {
+            <span class="d-none d-sm-inline">Light</span>
+        }
+    }
+    else
+    {
+        <i class="bi bi-moon-stars-fill text-primary"></i> 
+        @if (ShowLabel)
+        {
+            <span class="d-none d-sm-inline">Dark</span>
+        }
+    }
+</button>
+
+@code {
+    [Parameter]
+    public bool IsDarkMode { get; set; } = false;
+
+    [Parameter]
+    public bool ShowLabel { get; set; } = true;
+
+    [Parameter]
+    public string ButtonClass { get; set; } = "btn-outline-secondary";
+
+    [Parameter]
+    public EventCallback<bool> OnThemeChanged { get; set; }
+
+    private async Task ToggleTheme()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("toggleTheme");
+            IsDarkMode = !IsDarkMode;
+            await OnThemeChanged.InvokeAsync(IsDarkMode);
+        }
+        catch
+        {
+            IsDarkMode = !IsDarkMode;
+            await OnThemeChanged.InvokeAsync(IsDarkMode);
+        }
+    }
+}

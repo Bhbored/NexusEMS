@@ -14,11 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\BranchManager\" />
+    <Folder Include="Pages\HR\" />
+    <Folder Include="Pages\Accounting\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NexusEMS.Shared\NexusEMS.Shared.csproj" />
+    <ProjectReference Include="..\NexusEMS.Tests\NexusEMS.Tests.csproj" />
   </ItemGroup>
 
 </Project>
