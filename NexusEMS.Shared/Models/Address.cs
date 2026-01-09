@@ -4,9 +4,8 @@ using System.Text;
 
 namespace NexusEMS.Shared.Models
 {
-    public class Address
+    public class Address:EntityBase
     {
-        public int Id { get; set; }
         public string Street { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;

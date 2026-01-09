@@ -16,13 +16,13 @@ public class Department : EntityBase
 
     [Required]
     public Guid BranchId { get; set; }
-    public Guid? ChiefUserId { get; set; }
+    public Guid? ChiefId { get; set; }
     public decimal? Budget { get; set; }
-    public bool IsSystemDepartment { get; set; } = false;
+    public bool IsSystemDepartment { get; set; } = false;// HR/Accounting departments
 
     //Navigation Property
     public Branch? Branch { get; set; }
-    public User? Chief { get; set; }
+    public Employee? Chief { get; set; }
     public ICollection<Employee> Employees { get; set; } = [];
     public ICollection<User> Users { get; set; } = [];
     public ICollection<WorkSchedule> WorkSchedules { get; set; } = [];
@@ -36,9 +36,11 @@ public class Department : EntityBase
     {
         get
         {
-            var firstName = Employees?.FirstOrDefault(x => x.Id == ChiefUserId).FirstName ?? "";
-            var lastName = Employees?.FirstOrDefault(x => x.Id == ChiefUserId).LastName ?? "";
-            return $"{firstName} {lastName}";
+            var chief = Chief ?? Employees?.FirstOrDefault(e => e.Id == ChiefId);
+            if (chief == null) return string.Empty;
+            var first = chief.FirstName ?? string.Empty;
+            var last = chief.LastName ?? string.Empty;
+            return $"{first} {last}".Trim();
         }
     }
 }

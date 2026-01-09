@@ -29,7 +29,7 @@
 
                     <div class="col-md-6">
                         <label for="head" class="form-label">Head of Department</label>
-                         <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.ChiefUserId">
+                         <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.ChiefId">
                             <option value="">Select Chief...</option>
                             @foreach (var emp in EligibleChiefs)
                             {

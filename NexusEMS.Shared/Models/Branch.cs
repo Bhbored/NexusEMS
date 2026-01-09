@@ -17,18 +17,29 @@ namespace NexusEMS.Shared.Models
         [MaxLength(30)]
         public string? Code { get; set; }
 
-        public Guid? ManagerUserId { get; set; }
+        public Guid? ManagerId { get; set; }
         public string? Location { get; set; }
         public decimal? Budget { get; set; }
         public string? ContactNumber { get; set; }
 
         //Navigation Property
-        public User? Manager { get; set; }
+        public Employee? Manager { get; set; }
         public ICollection<Department> Departments { get; set; } = [];
         public ICollection<Employee> Employees { get; set; } = [];
         public ICollection<User> Users { get; set; } = [];
         public ICollection<ComplaintCase> ComplaintCases { get; set; } = [];
         public ICollection<AuditLog> AuditLogs { get; set; } = [];
         public ICollection<SalaryConfiguration> SalaryConfigurations { get; set; } = [];
+
+        //readonly
+        public string MangerName
+        {
+            get
+            {
+                var firstName = Employees?.FirstOrDefault(x => x.Id == ManagerId).FirstName ?? "";
+                var lastName = Employees?.FirstOrDefault(x => x.Id == ManagerId).LastName ?? "";
+                return $"{firstName} {lastName}";
+            }
+        }
     }
 }

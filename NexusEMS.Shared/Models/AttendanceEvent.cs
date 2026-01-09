@@ -11,7 +11,7 @@ namespace NexusEMS.Shared.Models
         [Required]
         public Guid EmployeeProfileId { get; set; }
 
-        public DateTime TimestampUtc { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         public AttendanceEventType EventType { get; set; } = AttendanceEventType.CheckIn;
         public VerificationMethod VerificationMethod { get; set; } = VerificationMethod.Manual;

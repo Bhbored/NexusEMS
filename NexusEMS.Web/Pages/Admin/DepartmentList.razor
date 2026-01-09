@@ -9,8 +9,8 @@
     <p class="text-muted mb-0">Manage your company departments, budgets, and personnel.</p>
 </div>
 
-<DataGrid TItem="Department" 
-          Items="@Departments" 
+<DataGrid TItem="Department"
+          Items="@Departments"
           Title="All Departments"
           OnAddClick="@(() => Navigation.NavigateTo("/admin/departments/create"))"
           FilterStrategy="@FilterDepartments">
@@ -32,7 +32,7 @@
             </span>
         </td>
         <td>
-            @if (dept.ChiefUserId.HasValue && !string.IsNullOrEmpty(dept.DepartmentChiefName))
+            @if (dept.ChiefId.HasValue && !string.IsNullOrEmpty(dept.DepartmentChiefName))
             {
                 <div class="d-flex align-items-center gap-2">
                     <div class="department-head-avatar department-head-avatar-indigo">
@@ -52,17 +52,17 @@
             </span>
         </td>
         <td class="department-budget">
-            @(dept.Budget.HasValue ? dept.Budget.Value.ToString("C") : "-")
+            @(dept.Budget.HasValue? dept.Budget.Value.ToString("C") : "-")
         </td>
         <td class="text-end">
             <div class="d-flex justify-content-end gap-2">
-                <button class="btn btn-sm department-action-btn department-action-edit" 
-                        @onclick="() => EditDepartment(dept.Id)" 
+                <button class="btn btn-sm department-action-btn department-action-edit"
+                        @onclick="() => EditDepartment(dept.Id)"
                         title="Edit">
                     <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm department-action-btn department-action-delete" 
-                        @onclick="() => DeleteDepartment(dept)" 
+                <button class="btn btn-sm department-action-btn department-action-delete"
+                        @onclick="() => DeleteDepartment(dept)"
                         title="Delete">
                     <i class="bi bi-trash"></i>
                 </button>
@@ -71,26 +71,26 @@
     </RowTemplate>
 </DataGrid>
 
-<ConfirmationDialog @ref="DeleteConfirmation" 
-                    Title="Delete Department" 
+<ConfirmationDialog @ref="DeleteConfirmation"
+                    Title="Delete Department"
                     Message="@($"Are you sure you want to delete {DepartmentToDelete?.Name}?")"
                     OnConfirmation="OnDeleteConfirmed" />
 
 @code {
     private List<Department> Departments = new();
-    private ConfirmationDialog DeleteConfirmation;
-    private Department DepartmentToDelete;
+    private ConfirmationDialog DeleteConfirmation = new();
+    private Department DepartmentToDelete = new();
 
     protected override void OnInitialized()
     {
         var departments = TestData.GetDepartments();
         var employees = TestData.GetEmployees();
-        
-        Departments = departments.Select(d =>
+
+        foreach (var x in departments)
         {
-            d.Employees = employees.Where(e => e.DepartmentId == d.Id).ToList();
-            return d;
-        }).ToList();
+            x.Employees = employees.Where(e => e.DepartmentId == x.Id).ToList();
+            Departments.Add(x);
+        }
     }
 
     private bool FilterDepartments(Department dept, string searchTerm)

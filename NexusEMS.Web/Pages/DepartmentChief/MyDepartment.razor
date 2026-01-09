@@ -88,8 +88,8 @@ else
             if (DepartmentModel != null)
             {
                 DepartmentModel.Employees = employees.Where(e => e.DepartmentId == DepartmentModel.Id).ToList();
-                var firstName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefUserId)?.FirstName;
-                var lastName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefUserId)?.LastName;
+                var firstName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefId)?.FirstName;
+                var lastName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefId)?.LastName;
                 DepartmentChiefName = firstName != null && lastName != null ? $"{firstName} {lastName}" : null;
             }
         }

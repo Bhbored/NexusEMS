@@ -9,7 +9,7 @@ namespace NexusEMS.Shared.Models
     public class ComplaintCase : EntityBase
     {
         [Required]
-        public Guid CreatedByEmployeeProfileId { get; set; }
+        public Guid CreatedByEmployeeProfileId { get; set; }// the user who created the complaint
 
         [Required]
         public Guid DepartmentId { get; set; }

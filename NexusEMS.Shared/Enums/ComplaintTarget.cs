@@ -8,6 +8,7 @@ namespace NexusEMS.Shared.Enums
     {
         HR = 1,
         DepartmentChief = 2,
-        Both = 3
+        BranchManager = 3,
+        Admin = 4,
     }
 }

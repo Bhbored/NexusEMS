@@ -5,10 +5,20 @@ namespace NexusEMS.Web.Services
 {
     public class TestDataService
     {
+
+
         public List<User> GetUsers() => TestData.Users;
         public List<Employee> GetEmployees() => TestData.Employees;
         public List<Branch> GetBranches() => TestData.Branches;
-        public List<Department> GetDepartments() => TestData.Departments;
+        public List<Department> GetDepartments()
+        {
+            //TestData.AssignDepartements();
+            return TestData.Departments;
+
+        }
+
+
+
         public List<Position> GetPositions() => TestData.Positions;
         public List<SalaryConfiguration> GetSalaryConfigurations() => TestData.SalaryConfigurations;
         public List<SalaryPackage> GetSalaryPackages() => TestData.SalaryPackages;

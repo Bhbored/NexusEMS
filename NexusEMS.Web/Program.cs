@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using NexusEMS.Web.Services;
+using NexusEMS.Web.Test;
 
 namespace NexusEMS.Web
 {

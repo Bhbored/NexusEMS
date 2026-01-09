@@ -5,6 +5,8 @@ namespace NexusEMS.Web.Test;
 
 public static class TestData
 {
+
+    
     // Positions
     public static List<Position> Positions = new()
     {
@@ -60,24 +62,24 @@ public static class TestData
     // Branches
     public static List<Branch> Branches = new()
     {
-        new Branch { Name = "North Branch", Code = "BR001", Location = "New York", Budget = 1000000, ContactNumber = "+1-555-001", ManagerUserId = Users[1].Id },
-        new Branch { Name = "South Branch", Code = "BR002", Location = "Los Angeles", Budget = 1200000, ContactNumber = "+1-555-002", ManagerUserId = Users[2].Id },
-        new Branch { Name = "East Branch", Code = "BR003", Location = "Chicago", Budget = 1400000, ContactNumber = "+1-555-003", ManagerUserId = Users[3].Id },
-        new Branch { Name = "West Branch", Code = "BR004", Location = "Houston", Budget = 1600000, ContactNumber = "+1-555-004", ManagerUserId = Users[4].Id },
-        new Branch { Name = "Central Branch", Code = "BR005", Location = "Phoenix", Budget = 1800000, ContactNumber = "+1-555-005", ManagerUserId = Users[5].Id }
+        new Branch { Name = "North Branch", Code = "BR001", Location = "New York", Budget = 1000000, ContactNumber = "+1-555-001", ManagerId = Users[1].Id },
+        new Branch { Name = "South Branch", Code = "BR002", Location = "Los Angeles", Budget = 1200000, ContactNumber = "+1-555-002", ManagerId = Users[2].Id },
+        new Branch { Name = "East Branch", Code = "BR003", Location = "Chicago", Budget = 1400000, ContactNumber = "+1-555-003", ManagerId = Users[3].Id },
+        new Branch { Name = "West Branch", Code = "BR004", Location = "Houston", Budget = 1600000, ContactNumber = "+1-555-004", ManagerId = Users[4].Id },
+        new Branch { Name = "Central Branch", Code = "BR005", Location = "Phoenix", Budget = 1800000, ContactNumber = "+1-555-005", ManagerId = Users[5].Id }
     };
 
     // Departments
     public static List<Department> Departments = new()
     {
-        new Department { Name = "Engineering - North", Code = "ENG01", BranchId = Branches[0].Id, ChiefUserId = Users[6].Id, Budget = 200000, IsSystemDepartment = false },
-        new Department { Name = "Marketing - North", Code = "MKT01", BranchId = Branches[0].Id, ChiefUserId = Users[7].Id, Budget = 180000, IsSystemDepartment = false },
-        new Department { Name = "HR - North", Code = "HR01", BranchId = Branches[0].Id, ChiefUserId = Users[10].Id, Budget = 150000, IsSystemDepartment = true },
-        new Department { Name = "Accounting - North", Code = "ACC01", BranchId = Branches[0].Id, ChiefUserId = Users[12].Id, Budget = 180000, IsSystemDepartment = true },
-        new Department { Name = "Engineering - South", Code = "ENG02", BranchId = Branches[1].Id, ChiefUserId = Users[8].Id, Budget = 220000, IsSystemDepartment = false },
-        new Department { Name = "Marketing - South", Code = "MKT02", BranchId = Branches[1].Id, ChiefUserId = Users[9].Id, Budget = 190000, IsSystemDepartment = false },
-        new Department { Name = "HR - South", Code = "HR02", BranchId = Branches[1].Id, ChiefUserId = Users[11].Id, Budget = 160000, IsSystemDepartment = true },
-        new Department { Name = "Accounting - South", Code = "ACC02", BranchId = Branches[1].Id, ChiefUserId = Users[13].Id, Budget = 190000, IsSystemDepartment = true }
+        new Department { Name = "Engineering - North", Code = "ENG01", BranchId = Branches[0].Id, ChiefId = Users[6].Id, Budget = 200000, IsSystemDepartment = false , },
+        new Department { Name = "Marketing - North", Code = "MKT01", BranchId = Branches[0].Id, ChiefId = Users[7].Id, Budget = 180000, IsSystemDepartment = false },
+        new Department { Name = "HR - North", Code = "HR01", BranchId = Branches[0].Id, ChiefId = Users[10].Id, Budget = 150000, IsSystemDepartment = true },
+        new Department { Name = "Accounting - North", Code = "ACC01", BranchId = Branches[0].Id, ChiefId = Users[12].Id, Budget = 180000, IsSystemDepartment = true },
+        new Department { Name = "Engineering - South", Code = "ENG02", BranchId = Branches[1].Id, ChiefId = Users[8].Id, Budget = 220000, IsSystemDepartment = false },
+        new Department { Name = "Marketing - South", Code = "MKT02", BranchId = Branches[1].Id, ChiefId = Users[9].Id, Budget = 190000, IsSystemDepartment = false },
+        new Department { Name = "HR - South", Code = "HR02", BranchId = Branches[1].Id, ChiefId = Users[11].Id, Budget = 160000, IsSystemDepartment = true },
+        new Department { Name = "Accounting - South", Code = "ACC02", BranchId = Branches[1].Id, ChiefId = Users[13].Id, Budget = 190000, IsSystemDepartment = true }
     };
 
     // Employees
@@ -119,6 +121,13 @@ public static class TestData
         new Employee { FirstName = "Nicole", LastName = "Robinson", Email = "emp020@nexusems.com", Phone = "+1234567923", Gender = Gender.Female, EmployeeCode = "EMP020", EducationLevel = EducationLevel.Bachelor, DateOfBirth = new DateTime(1996, 10, 1), IsMarried = true, NumberOfChildren = 1, HireDate = new DateTime(2022, 4, 1), ContractType = ContractType.FullTime, EmploymentStatus = EmploymentStatus.Active, BranchId = Branches[1].Id, DepartmentId = Departments[5].Id, PositionId = Positions[5].Id, AssignedToUserId = Users[33].Id }
     };
 
+    //public static void AssignDepartements()
+    //{
+    //    foreach (var x in Departments)
+    //    {
+    //        x.Employees = Employees.Where(e => e.DepartmentId == x.Id).ToList();
+    //    }
+    //}
     // Placeholder lists for other models
     public static List<SalaryConfiguration> SalaryConfigurations = new();
     public static List<SalaryPackage> SalaryPackages = new();

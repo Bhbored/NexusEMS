@@ -56,7 +56,7 @@ public class Employee : EntityBase
 
     //readonly 
 
-    // Computed Properties (add after navigation properties, before the closing brace)
+    // Computed Properties 
     public SalaryPackage? CurrentSalaryPackage
     {
         get
