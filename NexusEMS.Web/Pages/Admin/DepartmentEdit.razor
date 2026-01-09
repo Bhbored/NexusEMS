@@ -1,7 +1,7 @@
 @page "/admin/departments/edit/{Id:int}"
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject NavigationManager Navigation
 
 <div class="mb-6">
@@ -37,7 +37,7 @@
 
                         <div class="col-md-6">
                             <label for="head" class="form-label">Head of Department</label>
-                             <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.HeadOfDepartmentId">
+                             <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.ChiefUserId">
                                 <option value="">Select Chief...</option>
                                 @foreach (var emp in EligibleChiefs)
                                 {
@@ -62,18 +62,19 @@
     }
 
 @code {
-    [Parameter] public int Id { get; set; }
-    private Department Department;
+    [Parameter] public Guid Id { get; set; }
+    private Department? Department;
     private List<Employee> EligibleChiefs = new();
 
     protected override void OnInitialized()
     {
         // Get eligible chiefs from mock employees
-        var employees = MockEmployees.GetEmployees();
-        EligibleChiefs = employees.Take(2).ToList();
+        var employees = TestData.GetEmployees();
+        var currentChiefId = Department?.ChiefUserId;
+        EligibleChiefs = employees.Where(x=>x.Id != currentChiefId).ToList();
 
         // Load department from mock data
-        var departments = MockDepartments.GetDepartments();
+        var departments = TestData.GetDepartments();
         Department = departments.FirstOrDefault(d => d.Id == Id);
         
         if (Department == null)
@@ -84,7 +85,6 @@
                 Name = "Engineering", 
                 Description = "Mock Description", 
                 Budget = 500000, 
-                HeadOfDepartmentId = 2 
             };
         }
     }

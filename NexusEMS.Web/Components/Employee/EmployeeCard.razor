@@ -46,7 +46,7 @@
         if (Employee == null) return "cyan";
         
         var colors = new[] { "cyan", "blue", "indigo", "purple" };
-        var index = (Employee.Id - 1) % colors.Length;
+        var index = 1;
         return colors[index];
     }
 }

@@ -1,7 +1,8 @@
 @page "/admin/employees/edit/{Id:int}"
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject NavigationManager Navigation
 
 <div class="mb-6">
@@ -71,7 +72,7 @@
 
                          <div class="col-md-6">
                             <label for="position" class="form-label">Position <span class="text-danger">*</span></label>
-                             <InputText id="position" class="form-control" @bind-Value="Employee.Position" />
+                             <InputText id="position" class="form-control" @bind-Value="Employee.Position!.Title" />
                              <ValidationMessage For="@(() => Employee.Position)" />
                         </div>
                         
@@ -83,12 +84,12 @@
 
                           <div class="col-md-6">
                             <label for="salary" class="form-label">Salary</label>
-                             <InputNumber id="salary" class="form-control" @bind-Value="Employee.Salary" />
+                             <InputNumber id="salary" class="form-control" @bind-Value="Employee.SalaryPackages" />
                         </div>
                          
                         <div class="col-md-6">
                             <label for="empType" class="form-label">Employment Type</label>
-                             <InputSelect id="empType" class="form-select text-dark" @bind-Value="Employee.EmploymentType">
+                             <InputSelect id="empType" class="form-select text-dark" @bind-Value="Employee.ContractType">
                                 <option value="FullTime">Full Time</option>
                                 <option value="PartTime">Part Time</option>
                                 <option value="Contract">Contract</option>
@@ -97,7 +98,7 @@
                         
                          <div class="col-md-6">
                              <div class="form-check mt-4">
-                                <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Employee.IsActive" />
+                                <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Employee.IsMarried" />
                                 <label class="form-check-label" for="isActive">Is Active Employee</label>
                             </div>
                         </div>
@@ -113,31 +114,31 @@
     }
 
 @code {
-    [Parameter] public int Id { get; set; }
-    private Employee Employee;
+    [Parameter] public Guid Id { get; set; }
+    private Employee? Employee;
     private List<Department> Departments = new();
 
     protected override void OnInitialized()
     {
-        Departments = MockDepartments.GetDepartments();
-        
+        Departments = TestData.GetDepartments();
+
         // Mock Employee Load
-        var employees = MockEmployees.GetEmployees();
-        Employee = employees.FirstOrDefault(e => e.Id == Id);
-        
+        var employees = TestData.GetEmployees();
+        Employee = employees?.FirstOrDefault(e => e.Id == Id);
+
         if (Employee == null)
         {
             Employee = new Employee 
             { 
-                Id = Id, 
                 FirstName = "John", 
                 LastName = "Doe", 
                 Email = "john.doe@nexus.com", 
-                DepartmentId = 1, 
-                Position = "Software Engineer",
+                Position = new()
+                {
+                Title="software engineere"    
+                },
                 HireDate = DateTime.Today.AddYears(-2),
-                IsActive = true,
-                EmploymentType = "FullTime"
+                ContractType = ContractType.FullTime
             };
         }
     }

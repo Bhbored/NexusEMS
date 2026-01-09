@@ -2,7 +2,7 @@
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.Department
 @using NexusEMS.Web.Services
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject AuthService AuthService
 
 <div class="mb-6">
@@ -64,7 +64,7 @@ else
                                 <i class="bi bi-person-badge fs-2"></i>
                             </div>
                             <div class="small text-muted text-uppercase fw-semibold mb-2">Department Head</div>
-                            <div class="h3 fw-bold mb-0">@(DepartmentModel.HeadOfDepartmentName ?? "Unassigned")</div>
+                            <div class="h3 fw-bold mb-0">@(DepartmentChiefName ?? "Unassigned")</div>
                         </div>
                     </div>
                 </div>
@@ -75,18 +75,22 @@ else
 
 @code {
     private Department? DepartmentModel;
+    private string? DepartmentChiefName;
 
     protected override void OnInitialized()
     {
         if (AuthService.CurrentUser?.DepartmentId.HasValue == true)
         {
-            var departments = MockDepartments.GetDepartments();
-            var employees = MockEmployees.GetEmployees();
+            var departments = TestData.GetDepartments();
+            var employees = TestData.GetEmployees();
 
             DepartmentModel = departments.FirstOrDefault(d => d.Id == AuthService.CurrentUser.DepartmentId);
             if (DepartmentModel != null)
             {
                 DepartmentModel.Employees = employees.Where(e => e.DepartmentId == DepartmentModel.Id).ToList();
+                var firstName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefUserId)?.FirstName;
+                var lastName = employees.FirstOrDefault(e => e.Id == DepartmentModel.ChiefUserId)?.LastName;
+                DepartmentChiefName = firstName != null && lastName != null ? $"{firstName} {lastName}" : null;
             }
         }
     }

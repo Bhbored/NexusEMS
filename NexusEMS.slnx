@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="NexusEMS.Server/NexusEMS.Server.csproj" />
   <Project Path="NexusEMS.Shared/NexusEMS.Shared.csproj" Id="904489d6-dbca-4c21-b054-6898d1b7a89a" />
-  <Project Path="NexusEMS.Tests/NexusEMS.Tests.csproj" Id="d716e456-818c-4634-95a3-82a1e5c332c4" />
   <Project Path="NexusEMS.Web/NexusEMS.Web.csproj" />
 </Solution>

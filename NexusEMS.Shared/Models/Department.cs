@@ -29,4 +29,16 @@ public class Department : EntityBase
     public ICollection<ComplaintCase> ComplaintCases { get; set; } = [];
     public ICollection<AuditLog> AuditLogs { get; set; } = [];
     public ICollection<SalaryConfiguration> SalaryConfigurations { get; set; } = [];
+
+
+    //readonly
+    public string DepartmentChiefName
+    {
+        get
+        {
+            var firstName = Employees?.FirstOrDefault(x => x.Id == ChiefUserId).FirstName ?? "";
+            var lastName = Employees?.FirstOrDefault(x => x.Id == ChiefUserId).LastName ?? "";
+            return $"{firstName} {lastName}";
+        }
+    }
 }

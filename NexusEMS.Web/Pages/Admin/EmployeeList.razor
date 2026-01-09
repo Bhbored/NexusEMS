@@ -1,7 +1,7 @@
 @page "/admin/employees"
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.UI
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject NavigationManager Navigation
 
 <div class="mb-6">
@@ -71,9 +71,9 @@
 
     protected override void OnInitialized()
     {
-        var employees = MockEmployees.GetEmployees();
-        var departments = MockDepartments.GetDepartments();
-        
+        var employees = TestData.GetEmployees();
+        var departments = TestData.GetDepartments();
+
         Employees = employees.Select(e =>
         {
             e.Department = departments.FirstOrDefault(d => d.Id == e.DepartmentId);
@@ -89,10 +89,10 @@
                emp.LastName.ToLower().Contains(searchTerm) ||
                emp.Email.ToLower().Contains(searchTerm) ||
                (emp.Department?.Name?.ToLower().Contains(searchTerm) ?? false) ||
-               emp.Position.ToLower().Contains(searchTerm);
+               emp.Position!.Title.ToLower().Contains(searchTerm);
     }
 
-    private void EditEmployee(int id)
+    private void EditEmployee(Guid id)
     {
         Navigation.NavigateTo($"/admin/employees/edit/{id}");
     }
@@ -118,10 +118,10 @@
         return $"{(first?.FirstOrDefault())}{(last?.FirstOrDefault())}";
     }
 
-    private string GetAvatarColor(int employeeId)
+    private string GetAvatarColor(Guid employeeId)
     {
         var colors = new[] { "indigo", "blue", "orange", "pink" };
-        var index = (employeeId - 1) % colors.Length;
+        var index = 1;
         return colors[index];
     }
 }

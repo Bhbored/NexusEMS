@@ -105,4 +105,5 @@ public class Employee : EntityBase
                 .FirstOrDefault(c => c.Type == SalaryComponentType.Base)?.Amount ?? 0;
         }
     }
+    public bool IsActive => EmploymentStatus == EmploymentStatus.Active;
 }

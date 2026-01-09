@@ -1,8 +1,9 @@
 @page "/chief/team"
+@using NexusEMS.Shared.Enums
 @using NexusEMS.Shared.Models
 @using NexusEMS.Web.Components.UI
 @using NexusEMS.Web.Services
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject NavigationManager Navigation
 @inject AuthService AuthService
 
@@ -73,8 +74,8 @@
     {
         if (AuthService.CurrentUser?.DepartmentId.HasValue == true)
         {
-            var employees = MockEmployees.GetEmployees();
-            var departments = MockDepartments.GetDepartments();
+            var employees = TestData.GetEmployees();
+            var departments = TestData.GetDepartments();
 
             MyTeam = employees.Where(e => e.DepartmentId == AuthService.CurrentUser.DepartmentId).ToList();
             MyDepartmentName = departments.FirstOrDefault(d => d.Id == AuthService.CurrentUser.DepartmentId)?.Name ?? "Unknown";
@@ -88,17 +89,17 @@
         return emp.FirstName.ToLower().Contains(searchTerm) ||
         emp.LastName.ToLower().Contains(searchTerm) ||
         emp.Email.ToLower().Contains(searchTerm) ||
-        emp.Position.ToLower().Contains(searchTerm);
+        emp.Position!.Title.ToLower().Contains(searchTerm);
     }
 
-    private void EditEmployee(int id)
+    private void EditEmployee(Guid id)
     {
         Navigation.NavigateTo($"/chief/employees/edit/{id}");
     }
 
     private void ToggleStatus(Employee emp)
     {
-        emp.IsActive = !emp.IsActive;
+        emp.EmploymentStatus = EmploymentStatus.Suspended;
         // Mock API call to save status
         StateHasChanged();
     }
@@ -108,10 +109,10 @@
         return $"{(first?.FirstOrDefault())}{(last?.FirstOrDefault())}";
     }
 
-    private string GetAvatarColor(int employeeId)
+    private string GetAvatarColor(Guid employeeId)
     {
         var colors = new[] { "indigo", "blue", "orange", "pink" };
-        var index = (employeeId - 1) % colors.Length;
+        var index = 1;
         return colors[index];
     }
 }

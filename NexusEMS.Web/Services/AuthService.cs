@@ -31,34 +31,33 @@ public class AuthService
     {
         await Task.Delay(100);
         var user = _repo.GetUsers().FirstOrDefault(u =>
-            u.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && u.PasswordHash.Equals(password, StringComparison.OrdinalIgnoreCase));
+            u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
 
-        if (user != null && !user.IsOnline)
+        if (user != null && user.PasswordHash == password)
         {
-            // Update user status
+            if (user.IsOnline)
+            {
+                return null;
+            }
+
             user.IsOnline = true;
             user.LastLoginAt = DateTime.Now;
 
-            // Create new session log
             var session = new SessionLog
             {
                 UserId = user.Id,
                 LoginAt = DateTime.Now,
                 IsActive = true,
-                // Note: In Blazor WebAssembly, we can't easily get real IP/UserAgent from server-side
-                // These would typically be captured by the backend API
-                IpAddress = "127.0.0.1", // Placeholder - should come from backend
-                UserAgent = "Blazor WebAssembly", // Placeholder - could use JSInterop to get real value
-                DeviceInfo = "Web Browser" // Placeholder
+                IpAddress = "127.0.0.1",
+                UserAgent = "Blazor WebAssembly",
+                DeviceInfo = "Web Browser"
             };
 
-            // Add session to user's session logs (preserves existing sessions)
             user.SessionLogs.Add(session);
             currentSession = session;
 
             CurrentUser = user;
             return user;
-
         }
 
         return null;

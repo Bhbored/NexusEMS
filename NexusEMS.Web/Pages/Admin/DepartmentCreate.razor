@@ -1,7 +1,7 @@
 @page "/admin/departments/create"
 @using NexusEMS.Shared.Models
 @using System.ComponentModel.DataAnnotations
-@using NexusEMS.Web.Tests
+@inject TestDataService TestData
 @inject NavigationManager Navigation
 
 <div class="mb-6">
@@ -29,7 +29,7 @@
 
                     <div class="col-md-6">
                         <label for="head" class="form-label">Head of Department</label>
-                         <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.HeadOfDepartmentId">
+                         <InputSelect id="head" class="form-select text-dark" @bind-Value="Department.ChiefUserId">
                             <option value="">Select Chief...</option>
                             @foreach (var emp in EligibleChiefs)
                             {
@@ -60,7 +60,7 @@
     protected override void OnInitialized()
     {
         // Get eligible chiefs from mock employees
-        var employees = MockEmployees.GetEmployees();
+        var employees = TestData.GetEmployees();
         EligibleChiefs = employees.Take(2).ToList();
     }
 
