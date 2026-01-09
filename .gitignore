@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /NexusEMS.Web/.cursor/rules
+/NexusEMS.Shared/MODELS_DOCUMENTATION.md
+/NexusEMS.Shared/SECONDARY_ROLE_IMPLEMENTATION.md
+/NexusEMS.Shared/USER_ROLES_AND_PERMISSIONS.md
