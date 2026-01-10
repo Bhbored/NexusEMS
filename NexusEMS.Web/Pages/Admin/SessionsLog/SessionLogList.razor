@@ -1,0 +1,249 @@
+@page "/admin/sessions"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Session Logs</h1>
+        <p class="text-muted mb-0">Monitor user login activity and session management</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card session-stat-card">
+            <div class="card-body">
+                <div class="session-stat-icon session-stat-icon-success mb-3">
+                    <i class="bi bi-circle-fill"></i>
+                </div>
+                <div class="session-stat-value">@ActiveSessions</div>
+                <div class="session-stat-label">Active Now</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card session-stat-card">
+            <div class="card-body">
+                <div class="session-stat-icon session-stat-icon-primary mb-3">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                <div class="session-stat-value">@Sessions.Count</div>
+                <div class="session-stat-label">Total Sessions</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card session-stat-card">
+            <div class="card-body">
+                <div class="session-stat-icon session-stat-icon-info mb-3">
+                    <i class="bi bi-calendar-day"></i>
+                </div>
+                <div class="session-stat-value">@TodaySessions</div>
+                <div class="session-stat-label">Today</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card session-stat-card">
+            <div class="card-body">
+                <div class="session-stat-icon session-stat-icon-warning mb-3">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="session-stat-value">@AvgDuration</div>
+                <div class="session-stat-label">Avg Duration</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header session-list-header">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <div class="input-group session-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search user..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <SfDatePicker TValue="DateTime?"
+                            @bind-Value="DateFilter"
+                            Placeholder="Select date"
+                            CssClass="e-custom-date">
+                </SfDatePicker>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" @bind="ShowActiveOnly" id="activeCheck">
+                    <label class="form-check-label" for="activeCheck">
+                        Active Only
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredSessions.Any())
+        {
+            <SfGrid DataSource="@FilteredSessions" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="20"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="User" Width="180">
+                        <Template>
+                            @{
+                                var session = (context as SessionLog)!;
+                                var user = Users.FirstOrDefault(u => u.Id == session.UserId);
+                                <div class="d-flex align-items-center">
+                                    <div class="session-avatar me-2">
+                                        @GetInitials(user?.Username ?? "")
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium small">@user?.Username</div>
+                                        <small class="text-muted">@user?.Role</small>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(SessionLog.LoginAt)" HeaderText="Login Time" Format="g" Width="160"></GridColumn>
+                    <GridColumn HeaderText="Logout Time" Width="160">
+                        <Template>
+                            @{
+                                var session = (context as SessionLog)!;
+                                if (session.LogoutAt.HasValue)
+                                {
+                                    <span>@session.LogoutAt.Value.ToString("g")</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-circle-fill me-1"></i>Active</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Duration" Width="120">
+                        <Template>
+                            @{
+                                var session = (context as SessionLog)!;
+                                if (session.SessionDuration.HasValue)
+                                {
+                                    var duration = session.SessionDuration.Value;
+                                    var formatted = duration.Hours > 0 
+                                        ? $"{duration.Hours}h {duration.Minutes}m"
+                                        : $"{duration.Minutes}m";
+                                    <span>@formatted</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Ongoing</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(SessionLog.IpAddress)" HeaderText="IP Address" Width="130"></GridColumn>
+                    <GridColumn HeaderText="Device" Width="150">
+                        <Template>
+                            @{
+                                var session = (context as SessionLog)!;
+                                <span class="small">@(session.DeviceInfo ?? "Unknown")</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-laptop session-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No sessions found</h5>
+                <p class="text-muted">User login sessions will be tracked here</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<SessionLog> Sessions = new();
+    private List<User> Users = new();
+    private string SearchTerm = string.Empty;
+    private DateTime? DateFilter;
+    private bool ShowActiveOnly = false;
+
+    private List<SessionLog> FilteredSessions
+    {
+        get
+        {
+            var query = Sessions.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(s =>
+                {
+                    var user = Users.FirstOrDefault(u => u.Id == s.UserId);
+                    return user != null && (
+                        user.Username.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                        user.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+                    );
+                });
+            }
+
+            if (DateFilter.HasValue)
+            {
+                var date = DateOnly.FromDateTime(DateFilter.Value);
+                query = query.Where(s => DateOnly.FromDateTime(s.LoginAt) == date);
+            }
+
+            if (ShowActiveOnly)
+            {
+                query = query.Where(s => s.IsActive);
+            }
+
+            return query.OrderByDescending(s => s.LoginAt).ToList();
+        }
+    }
+
+    private int ActiveSessions => Sessions.Count(s => s.IsActive);
+    private int TodaySessions => Sessions.Count(s => DateOnly.FromDateTime(s.LoginAt) == DateOnly.FromDateTime(DateTime.Today));
+    private string AvgDuration
+    {
+        get
+        {
+            var completed = Sessions.Where(s => s.SessionDuration.HasValue).ToList();
+            if (!completed.Any()) return "0m";
+            var avgMinutes = (int)completed.Average(s => s.SessionDuration!.Value.TotalMinutes);
+            return avgMinutes > 60 ? $"{avgMinutes / 60}h {avgMinutes % 60}m" : $"{avgMinutes}m";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Sessions = TestData.GetSessionLogs();
+        Users = TestData.GetUsers();
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        DateFilter = null;
+        ShowActiveOnly = false;
+    }
+}

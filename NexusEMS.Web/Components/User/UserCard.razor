@@ -1,0 +1,101 @@
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+
+<div class="card user-card h-100">
+    <div class="card-body">
+        <div class="d-flex align-items-start mb-3">
+            <div class="user-avatar me-3">
+                @GetInitials(User.Username)
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="user-name mb-1 fw-bold">@User.Username</h6>
+                <small class="user-email">@User.Email</small>
+                <div class="mt-2">
+                    <span class="badge user-role-badge user-role-@User.Role.ToString().ToLower()">
+                        @User.Role
+                    </span>
+                    @if (User.SecondaryRole.HasValue)
+                    {
+                        <span class="badge user-secondary-role-badge ms-1">
+                            @User.SecondaryRole.Value
+                        </span>
+                    }
+                </div>
+            </div>
+            @if (User.IsOnline)
+            {
+                <span class="user-status-online" title="Online">
+                    <i class="bi bi-circle-fill"></i>
+                </span>
+            }
+            else
+            {
+                <span class="user-status-offline" title="Offline">
+                    <i class="bi bi-circle-fill"></i>
+                </span>
+            }
+        </div>
+
+        <div class="user-info-grid">
+            @if (BranchName != null)
+            {
+                <div class="user-info-item">
+                    <i class="bi bi-building me-2"></i>
+                    <span>@BranchName</span>
+                </div>
+            }
+            @if (DepartmentName != null)
+            {
+                <div class="user-info-item">
+                    <i class="bi bi-diagram-3 me-2"></i>
+                    <span>@DepartmentName</span>
+                </div>
+            }
+            @if (User.LastLoginAt.HasValue)
+            {
+                <div class="user-info-item">
+                    <i class="bi bi-clock me-2"></i>
+                    <span>@GetLastLogin(User.LastLoginAt.Value)</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card-footer user-card-footer">
+        <button class="btn btn-sm user-action-btn" @onclick="@(() => OnView.InvokeAsync(User.Id))" title="View Details">
+            <i class="bi bi-eye me-1"></i>View
+        </button>
+        <button class="btn btn-sm user-action-btn" @onclick="@(() => OnEdit.InvokeAsync(User.Id))" title="Edit">
+            <i class="bi bi-pencil me-1"></i>Edit
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public User User { get; set; } = new();
+    [Parameter] public string? BranchName { get; set; }
+    [Parameter] public string? DepartmentName { get; set; }
+    [Parameter] public EventCallback<Guid> OnView { get; set; }
+    [Parameter] public EventCallback<Guid> OnEdit { get; set; }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private string GetLastLogin(DateTime lastLogin)
+    {
+        var diff = DateTime.UtcNow - lastLogin;
+        if (diff.TotalMinutes < 60)
+            return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24)
+            return $"{(int)diff.TotalHours}h ago";
+        if (diff.TotalDays < 7)
+            return $"{(int)diff.TotalDays}d ago";
+        return lastLogin.ToString("MMM dd");
+    }
+}

@@ -1,0 +1,299 @@
+@page "/admin/salary-changes"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Salary Change Requests</h1>
+        <p class="text-muted mb-0">Review and approve salary changes for leadership positions</p>
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Admin Approval Scope:</strong> You only approve changes for Branch Managers, Department Chiefs, HR Chiefs, and Accounting Chiefs. Regular employee changes are handled by Accounting department.
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card salary-change-stat-card">
+            <div class="card-body">
+                <div class="salary-change-stat-icon salary-change-stat-icon-warning mb-3">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="salary-change-stat-value">@PendingRequests</div>
+                <div class="salary-change-stat-label">Pending Review</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-change-stat-card">
+            <div class="card-body">
+                <div class="salary-change-stat-icon salary-change-stat-icon-success mb-3">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="salary-change-stat-value">@ApprovedRequests</div>
+                <div class="salary-change-stat-label">Approved</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-change-stat-card">
+            <div class="card-body">
+                <div class="salary-change-stat-icon salary-change-stat-icon-danger mb-3">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="salary-change-stat-value">@RejectedRequests</div>
+                <div class="salary-change-stat-label">Rejected</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-change-stat-card">
+            <div class="card-body">
+                <div class="salary-change-stat-icon salary-change-stat-icon-primary mb-3">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <div class="salary-change-stat-value">@LeadershipRequests</div>
+                <div class="salary-change-stat-label">Leadership Changes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 salary-change-main-card">
+    <div class="card-header salary-change-list-header">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group salary-change-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search employee..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <SfDropDownList TValue="string" TItem="StatusFilterItem"
+                              @bind-Value="StatusFilter"
+                              DataSource="@StatusFilterOptions"
+                              Placeholder="Filter by status"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-3">
+                <SfDropDownList TValue="string" TItem="RoleFilterItem"
+                              @bind-Value="RoleFilter"
+                              DataSource="@RoleFilterOptions"
+                              Placeholder="Filter by role"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredRequests.Any())
+        {
+            <SfGrid DataSource="@FilteredRequests" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="15"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="Employee" Width="200">
+                        <Template>
+                            @{
+                                var request = (context as SalaryChangeRequest)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == request.EmployeeProfileId);
+                                var user = Users.FirstOrDefault(u => u.EmployeeProfileId == employee?.Id);
+                                <div class="d-flex align-items-center">
+                                    <div class="salary-change-avatar me-2">
+                                        @GetInitials(employee?.FullName ?? "")
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">@employee?.FullName</div>
+                                        <small class="text-muted">@user?.Role.ToString()</small>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Requested By" Width="150">
+                        <Template>
+                            @{
+                                var request = (context as SalaryChangeRequest)!;
+                                var requestor = Users.FirstOrDefault(u => u.Id == request.RequestedByUserId);
+                                <span>@requestor?.Username</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(SalaryChangeRequest.EffectiveFrom)" HeaderText="Effective Date" Format="d" Width="130"></GridColumn>
+                    <GridColumn HeaderText="Status" Width="120">
+                        <Template>
+                            @{
+                                var request = (context as SalaryChangeRequest)!;
+                                var badgeClass = request.Status switch
+                                {
+                                    SalaryChangeStatus.Draft => "bg-secondary",
+                                    SalaryChangeStatus.Submitted => "bg-warning",
+                                    SalaryChangeStatus.Approved => "bg-success",
+                                    SalaryChangeStatus.Rejected => "bg-danger",
+                                    SalaryChangeStatus.Applied => "bg-info",
+                                    _ => "bg-secondary"
+                                };
+                                <span class="badge @badgeClass">@request.Status</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Changes" Width="100">
+                        <Template>
+                            @{
+                                var request = (context as SalaryChangeRequest)!;
+                                <span class="badge bg-primary">@request.Items.Count items</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(SalaryChangeRequest.CreatedAt)" HeaderText="Created" Format="d" Width="120"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var request = (context as SalaryChangeRequest)!;
+                                <button class="btn btn-sm btn-primary" @onclick="() => ViewDetails(request.Id)">
+                                    <i class="bi bi-eye me-1"></i>Review
+                                </button>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-clipboard-check salary-change-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No salary change requests</h5>
+                <p class="text-muted">Leadership salary change requests will appear here for your review</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<SalaryChangeRequest> Requests = new();
+    private List<Employee> Employees = new();
+    private List<User> Users = new();
+    private string SearchTerm = string.Empty;
+    private string StatusFilter = "All";
+    private string RoleFilter = "All";
+
+    private List<SalaryChangeRequest> FilteredRequests
+    {
+        get
+        {
+            var query = Requests.Where(r =>
+            {
+                var employee = Employees.FirstOrDefault(e => e.Id == r.EmployeeProfileId);
+                var user = Users.FirstOrDefault(u => u.EmployeeProfileId == employee?.Id);
+                return user != null && (
+                    user.Role == UserRole.BranchManager ||
+                    user.Role == UserRole.DepartmentChief ||
+                    user.Role == UserRole.HumanResources ||
+                    user.Role == UserRole.Accounting
+                );
+            }).AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(r =>
+                {
+                    var employee = Employees.FirstOrDefault(e => e.Id == r.EmployeeProfileId);
+                    return employee != null && employee.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                });
+            }
+
+            if (StatusFilter != "All")
+            {
+                var status = Enum.Parse<SalaryChangeStatus>(StatusFilter);
+                query = query.Where(r => r.Status == status);
+            }
+
+            if (RoleFilter != "All")
+            {
+                var role = Enum.Parse<UserRole>(RoleFilter);
+                query = query.Where(r =>
+                {
+                    var employee = Employees.FirstOrDefault(e => e.Id == r.EmployeeProfileId);
+                    var user = Users.FirstOrDefault(u => u.EmployeeProfileId == employee?.Id);
+                    return user?.Role == role;
+                });
+            }
+
+            return query.ToList();
+        }
+    }
+
+    private int PendingRequests => FilteredRequests.Count(r => r.Status == SalaryChangeStatus.Submitted);
+    private int ApprovedRequests => FilteredRequests.Count(r => r.Status == SalaryChangeStatus.Approved);
+    private int RejectedRequests => FilteredRequests.Count(r => r.Status == SalaryChangeStatus.Rejected);
+    private int LeadershipRequests => FilteredRequests.Count;
+
+    private List<StatusFilterItem> StatusFilterOptions = new()
+    {
+        new StatusFilterItem { Value = "All", Text = "All Statuses" },
+        new StatusFilterItem { Value = nameof(SalaryChangeStatus.Submitted), Text = "Submitted" },
+        new StatusFilterItem { Value = nameof(SalaryChangeStatus.Approved), Text = "Approved" },
+        new StatusFilterItem { Value = nameof(SalaryChangeStatus.Rejected), Text = "Rejected" },
+        new StatusFilterItem { Value = nameof(SalaryChangeStatus.Applied), Text = "Applied" }
+    };
+
+    private List<RoleFilterItem> RoleFilterOptions = new()
+    {
+        new RoleFilterItem { Value = "All", Text = "All Roles" },
+        new RoleFilterItem { Value = nameof(UserRole.BranchManager), Text = "Branch Manager" },
+        new RoleFilterItem { Value = nameof(UserRole.DepartmentChief), Text = "Department Chief" },
+        new RoleFilterItem { Value = nameof(UserRole.HumanResources), Text = "HR Chief" },
+        new RoleFilterItem { Value = nameof(UserRole.Accounting), Text = "Accounting Chief" }
+    };
+
+    protected override void OnInitialized()
+    {
+        Requests = TestData.GetSalaryChangeRequests();
+        Employees = TestData.GetEmployees();
+        Users = TestData.GetUsers();
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/salary-changes/{id}");
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        StatusFilter = "All";
+        RoleFilter = "All";
+    }
+
+    private class StatusFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class RoleFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+}

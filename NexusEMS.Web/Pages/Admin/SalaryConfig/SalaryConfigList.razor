@@ -1,0 +1,185 @@
+@page "/admin/salary-configs"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Salary Configuration</h1>
+            <p class="text-muted mb-0">Manage salary calculation rules and formulas</p>
+        </div>
+        <button class="btn btn-primary" @onclick="CreateConfig">
+            <i class="bi bi-plus-circle me-2"></i>Create Configuration
+        </button>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card salary-config-stat-card">
+            <div class="card-body">
+                <div class="salary-config-stat-icon salary-config-stat-icon-primary mb-3">
+                    <i class="bi bi-sliders"></i>
+                </div>
+                <div class="salary-config-stat-value">@Configurations.Count</div>
+                <div class="salary-config-stat-label">Total Configurations</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-config-stat-card">
+            <div class="card-body">
+                <div class="salary-config-stat-icon salary-config-stat-icon-success mb-3">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div class="salary-config-stat-value">@BranchConfigs</div>
+                <div class="salary-config-stat-label">Branch Level</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-config-stat-card">
+            <div class="card-body">
+                <div class="salary-config-stat-icon salary-config-stat-icon-info mb-3">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+                <div class="salary-config-stat-value">@DeptConfigs</div>
+                <div class="salary-config-stat-label">Department Level</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card salary-config-stat-card">
+            <div class="card-body">
+                <div class="salary-config-stat-icon salary-config-stat-icon-warning mb-3">
+                    <i class="bi bi-calculator"></i>
+                </div>
+                <div class="salary-config-stat-value">@AvgBaseSalary.ToString("C0")</div>
+                <div class="salary-config-stat-label">Avg Base Salary</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header salary-config-list-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">All Configurations</h5>
+            <div class="input-group salary-config-search-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search..." 
+                       @bind="SearchTerm" @bind:event="oninput" />
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredConfigurations.Any())
+        {
+            <SfGrid DataSource="@FilteredConfigurations" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="10"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn Field="@nameof(SalaryConfiguration.Name)" HeaderText="Name" Width="200"></GridColumn>
+                    <GridColumn HeaderText="Scope" Width="150">
+                        <Template>
+                            @{
+                                var config = (context as SalaryConfiguration)!;
+                                if (config.BranchId.HasValue)
+                                {
+                                    <span class="badge bg-primary">Branch</span>
+                                }
+                                else if (config.DepartmentId.HasValue)
+                                {
+                                    <span class="badge bg-info">Department</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Global</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(SalaryConfiguration.BaseSalary)" HeaderText="Base Salary" Format="C0" Width="130"></GridColumn>
+                    <GridColumn Field="@nameof(SalaryConfiguration.HraPercentage)" HeaderText="HRA %" Width="100"></GridColumn>
+                    <GridColumn Field="@nameof(SalaryConfiguration.DaPercentage)" HeaderText="DA %" Width="100"></GridColumn>
+                    <GridColumn Field="@nameof(SalaryConfiguration.MarriedMultiplier)" HeaderText="Married" Width="100"></GridColumn>
+                    <GridColumn Field="@nameof(SalaryConfiguration.ChildMultiplier)" HeaderText="Per Child" Width="100"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="120">
+                        <Template>
+                            @{
+                                var config = (context as SalaryConfiguration)!;
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-primary" @onclick="() => EditConfig(config.Id)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteConfig(config)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-sliders salary-config-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No configurations found</h5>
+                <p class="text-muted">Create salary calculation rules for branches or departments</p>
+                <button class="btn btn-primary mt-2" @onclick="CreateConfig">
+                    <i class="bi bi-plus-circle me-2"></i>Create Configuration
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<ConfirmationDialog @ref="DeleteConfirmation" Title="Delete Configuration"
+                    Message="@($"Are you sure you want to delete {ConfigToDelete?.Name}?")" 
+                    OnConfirmation="OnDeleteConfirmed" />
+
+@code {
+    private List<SalaryConfiguration> Configurations = new();
+    private string SearchTerm = string.Empty;
+    private ConfirmationDialog DeleteConfirmation = new();
+    private SalaryConfiguration? ConfigToDelete;
+
+    private List<SalaryConfiguration> FilteredConfigurations => string.IsNullOrWhiteSpace(SearchTerm)
+        ? Configurations
+        : Configurations.Where(c =>
+            c.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+            (c.Description?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+        ).ToList();
+
+    private int BranchConfigs => Configurations.Count(c => c.BranchId.HasValue);
+    private int DeptConfigs => Configurations.Count(c => c.DepartmentId.HasValue);
+    private decimal AvgBaseSalary => Configurations.Any() ? Configurations.Average(c => c.BaseSalary) : 0;
+
+    protected override void OnInitialized()
+    {
+        Configurations = TestData.GetSalaryConfigurations();
+    }
+
+    private void CreateConfig() => Navigation.NavigateTo("/admin/salary-configs/create");
+    private void EditConfig(Guid id) => Navigation.NavigateTo($"/admin/salary-configs/edit/{id}");
+
+    private void DeleteConfig(SalaryConfiguration config)
+    {
+        ConfigToDelete = config;
+        DeleteConfirmation.Show();
+    }
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && ConfigToDelete != null)
+        {
+            Configurations.Remove(ConfigToDelete);
+            ConfigToDelete = null;
+            StateHasChanged();
+        }
+    }
+}

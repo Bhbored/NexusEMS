@@ -1,0 +1,155 @@
+@page "/admin/positions/edit/{PositionId:guid}"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Edit Position</h1>
+            <p class="text-muted mb-0">Update position information</p>
+        </div>
+    </div>
+</div>
+
+@if (PositionModel != null)
+{
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0">
+                <div class="card-header position-form-header">
+                    <h5 class="mb-0 fw-semibold">Position Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <EditForm Model="@PositionModel" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Position Title <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="PositionModel.Title" class="form-control" placeholder="e.g., Senior Software Engineer" />
+                                <ValidationMessage For="@(() => PositionModel.Title)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Description</label>
+                                <InputTextArea @bind-Value="PositionModel.Description" class="form-control" rows="4" placeholder="Enter position description and responsibilities" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Base Salary</label>
+                                <SfNumericTextBox @bind-Value="PositionModel.BaseSalary" 
+                                                Format="C0"
+                                                Placeholder="Base salary"
+                                                CssClass="e-custom-numeric"
+                                                ShowSpinButton="false">
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Minimum Salary</label>
+                                <SfNumericTextBox @bind-Value="PositionModel.SalaryRangeMin" 
+                                                Format="C0"
+                                                Placeholder="Min salary"
+                                                CssClass="e-custom-numeric"
+                                                ShowSpinButton="false">
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium">Maximum Salary</label>
+                                <SfNumericTextBox @bind-Value="PositionModel.SalaryRangeMax" 
+                                                Format="C0"
+                                                Placeholder="Max salary"
+                                                CssClass="e-custom-numeric"
+                                                ShowSpinButton="false">
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-danger" @onclick="DeletePosition">
+                                        <i class="bi bi-trash me-2"></i>Delete Position
+                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                            <i class="bi bi-x-circle me-2"></i>Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-clock-history me-2"></i>Metadata
+                    </h6>
+                    <div class="metadata-item">
+                        <small class="text-muted">Created</small>
+                        <div class="fw-medium">@PositionModel.CreatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Last Updated</small>
+                        <div class="fw-medium">@PositionModel.UpdatedAt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ConfirmationDialog @ref="DeleteConfirmation" Title="Delete Position"
+                        Message="@($"Are you sure you want to delete {PositionModel.Title}? This action cannot be undone.")" 
+                        OnConfirmation="OnDeleteConfirmed" />
+}
+else
+{
+    <div class="text-center py-5">
+        <LoadingSpinner />
+    </div>
+}
+
+@code {
+    [Parameter] public Guid PositionId { get; set; }
+
+    private Position? PositionModel;
+    private ConfirmationDialog DeleteConfirmation = new();
+
+    protected override void OnInitialized()
+    {
+        PositionModel = TestData.GetPositions().FirstOrDefault(p => p.Id == PositionId);
+    }
+
+    private void HandleSubmit()
+    {
+        if (PositionModel != null)
+        {
+            PositionModel.UpdatedAt = DateTime.UtcNow;
+            Navigation.NavigateTo("/admin/positions");
+        }
+    }
+
+    private void DeletePosition() => DeleteConfirmation.Show();
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && PositionModel != null)
+        {
+            TestData.GetPositions().Remove(PositionModel);
+            Navigation.NavigateTo("/admin/positions");
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/positions");
+}

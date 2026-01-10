@@ -1,6 +1,9 @@
 .nav-scrollable {
     overflow-y: auto;
     overflow-x: hidden;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .nav-scrollable::-webkit-scrollbar {

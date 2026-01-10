@@ -1,0 +1,126 @@
+@page "/admin/positions/create"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Create New Position</h1>
+            <p class="text-muted mb-0">Add a new job position to your organization</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0">
+            <div class="card-header position-form-header">
+                <h5 class="mb-0 fw-semibold">Position Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <EditForm Model="@NewPosition" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Position Title <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewPosition.Title" class="form-control" placeholder="e.g., Senior Software Engineer" />
+                            <ValidationMessage For="@(() => NewPosition.Title)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Description</label>
+                            <InputTextArea @bind-Value="NewPosition.Description" class="form-control" rows="4" placeholder="Enter position description and responsibilities" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Base Salary</label>
+                            <SfNumericTextBox @bind-Value="NewPosition.BaseSalary" 
+                                            Format="C0"
+                                            Placeholder="Base salary"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Minimum Salary</label>
+                            <SfNumericTextBox @bind-Value="NewPosition.SalaryRangeMin" 
+                                            Format="C0"
+                                            Placeholder="Min salary"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Maximum Salary</label>
+                            <SfNumericTextBox @bind-Value="NewPosition.SalaryRangeMax" 
+                                            Format="C0"
+                                            Placeholder="Max salary"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>Create Position
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 position-info-card">
+            <div class="card-body p-4">
+                <h6 class="fw-semibold mb-3">
+                    <i class="bi bi-info-circle me-2"></i>Position Setup Tips
+                </h6>
+                <ul class="position-tips-list">
+                    <li>
+                        <strong>Title:</strong> Use standard industry job titles
+                    </li>
+                    <li>
+                        <strong>Base Salary:</strong> Starting salary for this position
+                    </li>
+                    <li>
+                        <strong>Salary Range:</strong> Minimum and maximum compensation range
+                    </li>
+                    <li>
+                        <strong>Description:</strong> Include key responsibilities and requirements
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Position NewPosition = new();
+
+    private void HandleSubmit()
+    {
+        NewPosition.Id = Guid.NewGuid();
+        NewPosition.CreatedAt = DateTime.UtcNow;
+        NewPosition.UpdatedAt = DateTime.UtcNow;
+        
+        TestData.GetPositions().Add(NewPosition);
+        
+        Navigation.NavigateTo("/admin/positions");
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/positions");
+}

@@ -1,0 +1,273 @@
+@page "/admin/weekly-ratings"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Performance Ratings</h1>
+        <p class="text-muted mb-0">Monitor weekly performance ratings across the organization</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card rating-stat-card">
+            <div class="card-body">
+                <div class="rating-stat-icon rating-stat-icon-primary mb-3">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div class="rating-stat-value">@Ratings.Count</div>
+                <div class="rating-stat-label">Total Ratings</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card rating-stat-card">
+            <div class="card-body">
+                <div class="rating-stat-icon rating-stat-icon-success mb-3">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="rating-stat-value">@FinalizedRatings</div>
+                <div class="rating-stat-label">Finalized</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card rating-stat-card">
+            <div class="card-body">
+                <div class="rating-stat-icon rating-stat-icon-warning mb-3">
+                    <i class="bi bi-pencil"></i>
+                </div>
+                <div class="rating-stat-value">@DraftRatings</div>
+                <div class="rating-stat-label">In Progress</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card rating-stat-card">
+            <div class="card-body">
+                <div class="rating-stat-icon rating-stat-icon-info mb-3">
+                    <i class="bi bi-calendar-week"></i>
+                </div>
+                <div class="rating-stat-value">@ThisWeekRatings</div>
+                <div class="rating-stat-label">This Week</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header rating-list-header">
+        <div class="row g-3">
+            <div class="col-md-5">
+                <div class="input-group rating-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search employee..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <SfDropDownList TValue="Guid?" TItem="BranchFilterItem"
+                              @bind-Value="BranchFilter"
+                              DataSource="@BranchFilterOptions"
+                              Placeholder="Filter by branch"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" @bind="ShowFinalizedOnly" id="finalizedCheck">
+                    <label class="form-check-label" for="finalizedCheck">
+                        Finalized Only
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredRatings.Any())
+        {
+            <SfGrid DataSource="@FilteredRatings" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="15"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="Employee" Width="200">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == rating.EmployeeProfileId);
+                                <div class="d-flex align-items-center">
+                                    <div class="rating-avatar me-2">
+                                        @GetInitials(employee?.FullName ?? "")
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium small">@employee?.FullName</div>
+                                        <small class="text-muted">@employee?.EmployeeCode</small>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(WeeklyRating.WeekStartDate)" HeaderText="Week Starting" Format="d" Width="130"></GridColumn>
+                    <GridColumn HeaderText="Rated By" Width="150">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                var rater = Users.FirstOrDefault(u => u.Id == rating.CreatedByUserId);
+                                <span>@rater?.Username</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Revisions" Width="100">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                <span class="badge bg-primary">@rating.Revisions.Count</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Status" Width="120">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                if (rating.IsFinalized)
+                                {
+                                    <span class="badge bg-success"><i class="bi bi-lock me-1"></i>Finalized</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning"><i class="bi bi-pencil me-1"></i>Draft</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Department" Width="150">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == rating.EmployeeProfileId);
+                                var dept = employee != null 
+                                    ? Departments.FirstOrDefault(d => d.Id == employee.DepartmentId)
+                                    : null;
+                                <span class="small">@(dept?.Name ?? "N/A")</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(WeeklyRating.CreatedAt)" HeaderText="Created" Format="d" Width="120"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var rating = (context as WeeklyRating)!;
+                                <button class="btn btn-sm btn-primary" @onclick="() => ViewDetails(rating.Id)">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </button>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-star rating-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No ratings found</h5>
+                <p class="text-muted">Department Chiefs and Branch Managers create weekly performance ratings</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<WeeklyRating> Ratings = new();
+    private List<Employee> Employees = new();
+    private List<Department> Departments = new();
+    private List<Branch> Branches = new();
+    private List<User> Users = new();
+    private string SearchTerm = string.Empty;
+    private Guid? BranchFilter;
+    private bool ShowFinalizedOnly = false;
+
+    private List<WeeklyRating> FilteredRatings
+    {
+        get
+        {
+            var query = Ratings.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(r =>
+                {
+                    var employee = Employees.FirstOrDefault(e => e.Id == r.EmployeeProfileId);
+                    return employee != null && employee.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                });
+            }
+
+            if (BranchFilter.HasValue)
+            {
+                query = query.Where(r =>
+                {
+                    var employee = Employees.FirstOrDefault(e => e.Id == r.EmployeeProfileId);
+                    return employee?.BranchId == BranchFilter.Value;
+                });
+            }
+
+            if (ShowFinalizedOnly)
+            {
+                query = query.Where(r => r.IsFinalized);
+            }
+
+            return query.OrderByDescending(r => r.WeekStartDate).ToList();
+        }
+    }
+
+    private int FinalizedRatings => Ratings.Count(r => r.IsFinalized);
+    private int DraftRatings => Ratings.Count(r => !r.IsFinalized);
+    private int ThisWeekRatings => Ratings.Count(r => r.WeekStartDate >= DateOnly.FromDateTime(DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek)));
+
+    private List<BranchFilterItem> BranchFilterOptions = new();
+
+    protected override void OnInitialized()
+    {
+        Ratings = TestData.GetWeeklyRatings();
+        Employees = TestData.GetEmployees();
+        Departments = TestData.GetDepartments();
+        Branches = TestData.GetBranches();
+        Users = TestData.GetUsers();
+
+        BranchFilterOptions = new List<BranchFilterItem> { new BranchFilterItem { Id = null, Name = "All Branches" } };
+        BranchFilterOptions.AddRange(Branches.Select(b => new BranchFilterItem { Id = b.Id, Name = b.Name }));
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/weekly-ratings/{id}");
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        BranchFilter = null;
+        ShowFinalizedOnly = false;
+    }
+
+    private class BranchFilterItem
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}

@@ -137,3 +137,35 @@ h5, h6 {
     .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
         text-align: start;
     }
+
+/* Remove hover effects from card-body containing SfGrid (Syncfusion Grid) */
+.card-body:has(.e-grid),
+.card-body:has([class*="e-grid"]),
+.card-body:has(sf-grid),
+.card-body:has([data-sf-grid]) {
+    transition: none !important;
+}
+
+.card-body:has(.e-grid):hover,
+.card-body:has([class*="e-grid"]):hover,
+.card-body:has(sf-grid):hover,
+.card-body:has([data-sf-grid]):hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+    background-color: var(--bs-card-bg) !important;
+}
+
+/* Fallback for browsers that don't support :has() - target parent card */
+.card:has(.card-body .e-grid),
+.card:has(.card-body [class*="e-grid"]) {
+    transition: none !important;
+    background-color: var(--bs-card-bg) !important;
+}
+
+.card:has(.card-body .e-grid):hover,
+.card:has(.card-body [class*="e-grid"]):hover {
+    transform: none !important;
+    box-shadow: inherit !important;
+    background-color: var(--bs-card-bg) !important;
+}
+

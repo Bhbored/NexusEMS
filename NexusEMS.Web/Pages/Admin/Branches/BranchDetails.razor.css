@@ -1,0 +1,133 @@
+.branch-details-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+    border-radius: 0.5rem;
+}
+
+.branch-details-stat-card {
+    border: none;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.branch-details-stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.branch-details-stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.branch-details-stat-icon-primary {
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+}
+
+.branch-details-stat-icon-success {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+.branch-details-stat-icon-info {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.branch-details-stat-icon-warning {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+.branch-details-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin: 0.5rem 0 0.25rem;
+}
+
+.branch-details-stat-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.branch-details-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 1.25rem 1.5rem;
+}
+
+.branch-details-field {
+    margin-bottom: 0;
+}
+
+.branch-details-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.branch-details-value {
+    color: var(--bs-body-color);
+    font-size: 1rem;
+}
+
+.branch-manager-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.department-code-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--blue-50);
+    color: var(--blue);
+    border-radius: 0.5rem;
+}
+
+.system-dept-badge {
+    background-color: var(--purple-50);
+    color: var(--purple);
+}
+
+.regular-dept-badge {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+.metadata-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.metadata-item:last-child {
+    border-bottom: none;
+}
+
+.metadata-item small {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+}

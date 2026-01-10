@@ -1,0 +1,200 @@
+@page "/admin/branches/edit/{BranchId:guid}"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Edit Branch</h1>
+            <p class="text-muted mb-0">Update branch information</p>
+        </div>
+    </div>
+</div>
+
+@if (BranchModel != null)
+{
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 mb-4">
+                <div class="card-header branch-form-header">
+                    <h5 class="mb-0 fw-semibold">Branch Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <EditForm Model="@BranchModel" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Branch Name <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="BranchModel.Name" class="form-control" placeholder="Enter branch name" />
+                                <ValidationMessage For="@(() => BranchModel.Name)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Branch Code</label>
+                                <InputText @bind-Value="BranchModel.Code" class="form-control" placeholder="e.g., BR001" />
+                                <ValidationMessage For="@(() => BranchModel.Code)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-medium">Description</label>
+                                <InputTextArea @bind-Value="BranchModel.Description" class="form-control" rows="3" placeholder="Enter branch description" />
+                                <ValidationMessage For="@(() => BranchModel.Description)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Location</label>
+                                <InputText @bind-Value="BranchModel.Location" class="form-control" placeholder="City, State" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Contact Number</label>
+                                <InputText @bind-Value="BranchModel.ContactNumber" class="form-control" placeholder="+1-555-0000" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Budget</label>
+                                <SfNumericTextBox @bind-Value="BranchModel.Budget" 
+                                                Format="C0"
+                                                Placeholder="Enter budget amount"
+                                                CssClass="e-custom-numeric"
+                                                ShowSpinButton="false">
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Branch Manager</label>
+                                <SfDropDownList TValue="Guid?" TItem="User"
+                                              @bind-Value="BranchModel.ManagerId"
+                                              DataSource="@AvailableManagers"
+                                              Placeholder="Select branch manager"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Id" Text="Username"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-danger" @onclick="DeleteBranch">
+                                        <i class="bi bi-trash me-2"></i>Delete Branch
+                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                            <i class="bi bi-x-circle me-2"></i>Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 mb-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-info-circle me-2"></i>Branch Statistics
+                    </h6>
+                    <div class="branch-stat-item">
+                        <span class="branch-stat-label">Departments</span>
+                        <span class="branch-stat-value">@DepartmentCount</span>
+                    </div>
+                    <div class="branch-stat-item">
+                        <span class="branch-stat-label">Employees</span>
+                        <span class="branch-stat-value">@EmployeeCount</span>
+                    </div>
+                    <div class="branch-stat-item">
+                        <span class="branch-stat-label">Users</span>
+                        <span class="branch-stat-value">@UserCount</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 branch-info-card">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-clock-history me-2"></i>Metadata
+                    </h6>
+                    <div class="metadata-item">
+                        <small class="text-muted">Created</small>
+                        <div class="fw-medium">@BranchModel.CreatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Last Updated</small>
+                        <div class="fw-medium">@BranchModel.UpdatedAt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ConfirmationDialog @ref="DeleteConfirmation" Title="Delete Branch"
+                        Message="@($"Are you sure you want to delete {BranchModel.Name}? This action cannot be undone.")" 
+                        OnConfirmation="OnDeleteConfirmed" />
+}
+else
+{
+    <div class="text-center py-5">
+        <LoadingSpinner />
+    </div>
+}
+
+@code {
+    [Parameter] public Guid BranchId { get; set; }
+
+    private Branch? BranchModel;
+    private List<User> AvailableManagers = new();
+    private ConfirmationDialog DeleteConfirmation = new();
+
+    private int DepartmentCount;
+    private int EmployeeCount;
+    private int UserCount;
+
+    protected override void OnInitialized()
+    {
+        BranchModel = TestData.GetBranches().FirstOrDefault(b => b.Id == BranchId);
+        
+        if (BranchModel != null)
+        {
+            AvailableManagers = TestData.GetUsers()
+                .Where(u => u.Role == UserRole.BranchManager)
+                .ToList();
+
+            DepartmentCount = TestData.GetDepartments().Count(d => d.BranchId == BranchId);
+            EmployeeCount = TestData.GetEmployees().Count(e => e.BranchId == BranchId);
+            UserCount = TestData.GetUsers().Count(u => u.BranchId == BranchId);
+        }
+    }
+
+    private void HandleSubmit()
+    {
+        if (BranchModel != null)
+        {
+            BranchModel.UpdatedAt = DateTime.UtcNow;
+            Navigation.NavigateTo("/admin/branches");
+        }
+    }
+
+    private void DeleteBranch() => DeleteConfirmation.Show();
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && BranchModel != null)
+        {
+            TestData.GetBranches().Remove(BranchModel);
+            Navigation.NavigateTo("/admin/branches");
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/branches");
+}

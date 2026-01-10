@@ -1,0 +1,143 @@
+@page "/admin/branches/create"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Create New Branch</h1>
+            <p class="text-muted mb-0">Add a new branch location to your organization</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 mb-4">
+            <div class="card-header branch-form-header">
+                <h5 class="mb-0 fw-semibold">Branch Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <EditForm Model="@NewBranch" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Branch Name <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewBranch.Name" class="form-control" placeholder="Enter branch name" />
+                            <ValidationMessage For="@(() => NewBranch.Name)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Branch Code</label>
+                            <InputText @bind-Value="NewBranch.Code" class="form-control" placeholder="e.g., BR001" />
+                            <ValidationMessage For="@(() => NewBranch.Code)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Description</label>
+                            <InputTextArea @bind-Value="NewBranch.Description" class="form-control" rows="3" placeholder="Enter branch description" />
+                            <ValidationMessage For="@(() => NewBranch.Description)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Location</label>
+                            <InputText @bind-Value="NewBranch.Location" class="form-control" placeholder="City, State" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Contact Number</label>
+                            <InputText @bind-Value="NewBranch.ContactNumber" class="form-control" placeholder="+1-555-0000" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Budget</label>
+                            <SfNumericTextBox @bind-Value="NewBranch.Budget" 
+                                            Format="C0"
+                                            Placeholder="Enter budget amount"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Branch Manager</label>
+                            <SfDropDownList TValue="Guid?" TItem="User"
+                                          @bind-Value="NewBranch.ManagerId"
+                                          DataSource="@AvailableManagers"
+                                          Placeholder="Select branch manager"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Username"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>Create Branch
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 branch-info-card">
+            <div class="card-body p-4">
+                <h6 class="fw-semibold mb-3">
+                    <i class="bi bi-info-circle me-2"></i>Branch Setup Tips
+                </h6>
+                <ul class="branch-tips-list">
+                    <li>
+                        <strong>Branch Code:</strong> Use a unique identifier for easy reference
+                    </li>
+                    <li>
+                        <strong>Manager:</strong> Assign a user with BranchManager role
+                    </li>
+                    <li>
+                        <strong>Budget:</strong> Set initial budget allocation for planning
+                    </li>
+                    <li>
+                        <strong>Location:</strong> Include city and state for clarity
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Branch NewBranch = new();
+    private List<User> AvailableManagers = new();
+
+    protected override void OnInitialized()
+    {
+        AvailableManagers = TestData.GetUsers()
+            .Where(u => u.Role == UserRole.BranchManager)
+            .ToList();
+    }
+
+    private void HandleSubmit()
+    {
+        NewBranch.Id = Guid.NewGuid();
+        NewBranch.CreatedAt = DateTime.UtcNow;
+        NewBranch.UpdatedAt = DateTime.UtcNow;
+        
+        TestData.GetBranches().Add(NewBranch);
+        
+        Navigation.NavigateTo("/admin/branches");
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/branches");
+}

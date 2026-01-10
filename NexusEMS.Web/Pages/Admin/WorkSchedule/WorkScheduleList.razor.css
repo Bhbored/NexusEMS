@@ -1,0 +1,74 @@
+.schedule-stat-card {
+    border: none;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.schedule-stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.schedule-stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.schedule-stat-icon-primary {
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+}
+
+.schedule-stat-icon-warning {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+.schedule-stat-icon-success {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.schedule-stat-icon-info {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.schedule-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin: 0.5rem 0 0.25rem;
+}
+
+.schedule-stat-label {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.schedule-list-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 1.25rem 1.5rem;
+}
+
+.schedule-search-group .input-group-text {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-muted);
+    border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.schedule-search-group .form-control {
+    border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.schedule-empty-icon {
+    font-size: 4rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+}

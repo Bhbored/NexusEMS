@@ -1,0 +1,325 @@
+@page "/admin/branches/{BranchId:guid}"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <div>
+                <h1 class="h2 fw-bold mb-1">@BranchModel?.Name</h1>
+                <div class="d-flex align-items-center gap-2">
+                    @if (!string.IsNullOrEmpty(BranchModel?.Code))
+                    {
+                        <span class="badge branch-details-badge">@BranchModel.Code</span>
+                    }
+                    @if (!string.IsNullOrEmpty(BranchModel?.Location))
+                    {
+                        <span class="text-muted small">
+                            <i class="bi bi-geo-alt me-1"></i>@BranchModel.Location
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" @onclick="EditBranch">
+            <i class="bi bi-pencil me-2"></i>Edit Branch
+        </button>
+    </div>
+</div>
+
+@if (BranchModel != null)
+{
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card branch-details-stat-card">
+                <div class="card-body">
+                    <div class="branch-details-stat-icon branch-details-stat-icon-primary mb-3">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <div class="branch-details-stat-value">@Departments.Count</div>
+                    <div class="branch-details-stat-label">Departments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card branch-details-stat-card">
+                <div class="card-body">
+                    <div class="branch-details-stat-icon branch-details-stat-icon-success mb-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="branch-details-stat-value">@Employees.Count</div>
+                    <div class="branch-details-stat-label">Employees</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card branch-details-stat-card">
+                <div class="card-body">
+                    <div class="branch-details-stat-icon branch-details-stat-icon-info mb-3">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div class="branch-details-stat-value">@Users.Count</div>
+                    <div class="branch-details-stat-label">Users</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card branch-details-stat-card">
+                <div class="card-body">
+                    <div class="branch-details-stat-icon branch-details-stat-icon-warning mb-3">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <div class="branch-details-stat-value">@((BranchModel.Budget ?? 0).ToString("C0"))</div>
+                    <div class="branch-details-stat-label">Budget</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 mb-4">
+                <div class="card-header branch-details-header">
+                    <h5 class="mb-0 fw-semibold">Branch Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Branch Name</label>
+                                <div class="branch-details-value">@BranchModel.Name</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Branch Code</label>
+                                <div class="branch-details-value">@(BranchModel.Code ?? "-")</div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Description</label>
+                                <div class="branch-details-value">@(BranchModel.Description ?? "-")</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Location</label>
+                                <div class="branch-details-value">
+                                    @if (!string.IsNullOrEmpty(BranchModel.Location))
+                                    {
+                                        <i class="bi bi-geo-alt me-2 text-primary"></i>@BranchModel.Location
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Contact Number</label>
+                                <div class="branch-details-value">
+                                    @if (!string.IsNullOrEmpty(BranchModel.ContactNumber))
+                                    {
+                                        <i class="bi bi-telephone me-2 text-primary"></i>@BranchModel.ContactNumber
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="branch-details-field">
+                                <label class="branch-details-label">Branch Manager</label>
+                                <div class="branch-details-value">
+                                    @if (Manager != null)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="branch-manager-avatar me-2">
+                                                @GetInitials(Manager.Username)
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium">@Manager.Username</div>
+                                                <small class="text-muted">@Manager.Email</small>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">No manager assigned</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0">
+                <div class="card-header branch-details-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">Departments</h5>
+                        <button class="btn btn-sm btn-primary" @onclick="AddDepartment">
+                            <i class="bi bi-plus-circle me-1"></i>Add Department
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    @if (Departments.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Chief</th>
+                                        <th>Employees</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var dept in Departments)
+                                    {
+                                        <tr>
+                                            <td class="fw-medium">@dept.Name</td>
+                                            <td>
+                                                <span class="badge department-code-badge">@dept.Code</span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(dept.DepartmentChiefName))
+                                                {
+                                                    <span>@dept.DepartmentChiefName</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Unassigned</span>
+                                                }
+                                            </td>
+                                            <td>@Employees.Count(e => e.DepartmentId == dept.Id)</td>
+                                            <td>
+                                                @if (dept.IsSystemDepartment)
+                                                {
+                                                    <span class="badge system-dept-badge">System</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge regular-dept-badge">Regular</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-diagram-3 empty-state-icon"></i>
+                            <p class="text-muted mb-0">No departments in this branch yet</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 mb-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-clock-history me-2"></i>Metadata
+                    </h6>
+                    <div class="metadata-item">
+                        <small class="text-muted">Created</small>
+                        <div class="fw-medium">@BranchModel.CreatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Last Updated</small>
+                        <div class="fw-medium">@BranchModel.UpdatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Branch ID</small>
+                        <div class="fw-medium small">@BranchModel.Id</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-graph-up me-2"></i>Quick Actions
+                    </h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" @onclick="ViewDepartments">
+                            <i class="bi bi-diagram-3 me-2"></i>Manage Departments
+                        </button>
+                        <button class="btn btn-outline-primary" @onclick="ViewEmployees">
+                            <i class="bi bi-people me-2"></i>View Employees
+                        </button>
+                        <button class="btn btn-outline-primary" @onclick="ViewUsers">
+                            <i class="bi bi-person-badge me-2"></i>Manage Users
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <LoadingSpinner />
+    </div>
+}
+
+@code {
+    [Parameter] public Guid BranchId { get; set; }
+
+    private Branch? BranchModel;
+    private User? Manager;
+    private List<Department> Departments = new();
+    private List<Employee> Employees = new();
+    private List<User> Users = new();
+
+    protected override void OnInitialized()
+    {
+        BranchModel = TestData.GetBranches().FirstOrDefault(b => b.Id == BranchId);
+        
+        if (BranchModel != null)
+        {
+            Departments = TestData.GetDepartments().Where(d => d.BranchId == BranchId).ToList();
+            Employees = TestData.GetEmployees().Where(e => e.BranchId == BranchId).ToList();
+            Users = TestData.GetUsers().Where(u => u.BranchId == BranchId).ToList();
+            
+            if (BranchModel.ManagerId.HasValue)
+            {
+                Manager = TestData.GetUsers().FirstOrDefault(u => u.Id == BranchModel.ManagerId.Value);
+            }
+        }
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/branches");
+    private void EditBranch() => Navigation.NavigateTo($"/admin/branches/edit/{BranchId}");
+    private void AddDepartment() => Navigation.NavigateTo("/admin/departments/create");
+    private void ViewDepartments() => Navigation.NavigateTo("/admin/departments");
+    private void ViewEmployees() => Navigation.NavigateTo("/admin/employees");
+    private void ViewUsers() => Navigation.NavigateTo("/admin/users");
+}

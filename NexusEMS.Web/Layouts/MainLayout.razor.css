@@ -1,7 +1,11 @@
 .sidebar {
     box-shadow: 2px 0 8px var(--shadow);
     width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    flex-shrink: 0;
     transition: background-color 0.3s;
+    background-color: var(--sidebar-bg);
 }
 
 .sidebar .fs-4 {

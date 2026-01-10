@@ -1,0 +1,302 @@
+@page "/admin/attendance"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Attendance Tracking</h1>
+        <p class="text-muted mb-0">Monitor employee check-in/check-out across all branches</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card attendance-stat-card">
+            <div class="card-body">
+                <div class="attendance-stat-icon attendance-stat-icon-success mb-3">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                </div>
+                <div class="attendance-stat-value">@CheckIns</div>
+                <div class="attendance-stat-label">Check-Ins Today</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card attendance-stat-card">
+            <div class="card-body">
+                <div class="attendance-stat-icon attendance-stat-icon-danger mb-3">
+                    <i class="bi bi-box-arrow-right"></i>
+                </div>
+                <div class="attendance-stat-value">@CheckOuts</div>
+                <div class="attendance-stat-label">Check-Outs Today</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card attendance-stat-card">
+            <div class="card-body">
+                <div class="attendance-stat-icon attendance-stat-icon-warning mb-3">
+                    <i class="bi bi-pause-circle"></i>
+                </div>
+                <div class="attendance-stat-value">@OnBreak</div>
+                <div class="attendance-stat-label">On Break</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card attendance-stat-card">
+            <div class="card-body">
+                <div class="attendance-stat-icon attendance-stat-icon-primary mb-3">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="attendance-stat-value">@TotalEvents</div>
+                <div class="attendance-stat-label">Total Events</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header attendance-list-header">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="input-group attendance-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search employee..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <SfDropDownList TValue="string" TItem="EventTypeFilterItem"
+                              @bind-Value="EventTypeFilter"
+                              DataSource="@EventTypeFilterOptions"
+                              Placeholder="Event Type"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <SfDropDownList TValue="Guid?" TItem="BranchFilterItem"
+                              @bind-Value="BranchFilter"
+                              DataSource="@BranchFilterOptions"
+                              Placeholder="Branch"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-3">
+                <SfDatePicker TValue="DateTime?"
+                            @bind-Value="DateFilter"
+                            Placeholder="Select date"
+                            CssClass="e-custom-date">
+                </SfDatePicker>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredEvents.Any())
+        {
+            <SfGrid DataSource="@FilteredEvents" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="20"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="Employee" Width="200">
+                        <Template>
+                            @{
+                                var evt = (context as AttendanceEvent)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == evt.EmployeeProfileId);
+                                <div class="d-flex align-items-center">
+                                    <div class="attendance-avatar me-2">
+                                        @GetInitials(employee?.FullName ?? "")
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium small">@employee?.FullName</div>
+                                        <small class="text-muted">@employee?.EmployeeCode</small>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Event Type" Width="130">
+                        <Template>
+                            @{
+                                var evt = (context as AttendanceEvent)!;
+                                var badgeClass = evt.EventType switch
+                                {
+                                    AttendanceEventType.CheckIn => "bg-success",
+                                    AttendanceEventType.CheckOut => "bg-danger",
+                                    AttendanceEventType.BreakStart => "bg-warning",
+                                    AttendanceEventType.BreakEnd => "bg-info",
+                                    _ => "bg-secondary"
+                                };
+                                var icon = evt.EventType switch
+                                {
+                                    AttendanceEventType.CheckIn => "box-arrow-in-right",
+                                    AttendanceEventType.CheckOut => "box-arrow-right",
+                                    AttendanceEventType.BreakStart => "pause-circle",
+                                    AttendanceEventType.BreakEnd => "play-circle",
+                                    _ => "circle"
+                                };
+                                <span class="badge @badgeClass">
+                                    <i class="bi bi-@icon me-1"></i>@evt.EventType
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(AttendanceEvent.Timestamp)" HeaderText="Timestamp" Format="g" Width="160"></GridColumn>
+                    <GridColumn HeaderText="Location" Width="150">
+                        <Template>
+                            @{
+                                var evt = (context as AttendanceEvent)!;
+                                <span class="small">@(evt.LocationLabel ?? "N/A")</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Method" Width="120">
+                        <Template>
+                            @{
+                                var evt = (context as AttendanceEvent)!;
+                                <span class="badge bg-secondary small">@evt.VerificationMethod</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Department" Width="150">
+                        <Template>
+                            @{
+                                var evt = (context as AttendanceEvent)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == evt.EmployeeProfileId);
+                                var dept = employee != null 
+                                    ? Departments.FirstOrDefault(d => d.Id == employee.DepartmentId)
+                                    : null;
+                                <span class="small">@(dept?.Name ?? "N/A")</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-clock-history attendance-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No attendance events found</h5>
+                <p class="text-muted">Employee attendance events will appear here</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<AttendanceEvent> Events = new();
+    private List<Employee> Employees = new();
+    private List<Department> Departments = new();
+    private List<Branch> Branches = new();
+    private string SearchTerm = string.Empty;
+    private string EventTypeFilter = "All";
+    private Guid? BranchFilter;
+    private DateTime? DateFilter;
+
+    private List<AttendanceEvent> FilteredEvents
+    {
+        get
+        {
+            var query = Events.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(e =>
+                {
+                    var employee = Employees.FirstOrDefault(emp => emp.Id == e.EmployeeProfileId);
+                    return employee != null && employee.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
+                });
+            }
+
+            if (EventTypeFilter != "All")
+            {
+                var eventType = Enum.Parse<AttendanceEventType>(EventTypeFilter);
+                query = query.Where(e => e.EventType == eventType);
+            }
+
+            if (BranchFilter.HasValue)
+            {
+                query = query.Where(e =>
+                {
+                    var employee = Employees.FirstOrDefault(emp => emp.Id == e.EmployeeProfileId);
+                    return employee?.BranchId == BranchFilter.Value;
+                });
+            }
+
+            if (DateFilter.HasValue)
+            {
+                var date = DateOnly.FromDateTime(DateFilter.Value);
+                query = query.Where(e => DateOnly.FromDateTime(e.Timestamp) == date);
+            }
+
+            return query.OrderByDescending(e => e.Timestamp).ToList();
+        }
+    }
+
+    private int CheckIns => Events.Count(e => e.EventType == AttendanceEventType.CheckIn && DateOnly.FromDateTime(e.Timestamp) == DateOnly.FromDateTime(DateTime.Today));
+    private int CheckOuts => Events.Count(e => e.EventType == AttendanceEventType.CheckOut && DateOnly.FromDateTime(e.Timestamp) == DateOnly.FromDateTime(DateTime.Today));
+    private int OnBreak => Events.Count(e => e.EventType == AttendanceEventType.BreakStart && DateOnly.FromDateTime(e.Timestamp) == DateOnly.FromDateTime(DateTime.Today));
+    private int TotalEvents => Events.Count;
+
+    private List<EventTypeFilterItem> EventTypeFilterOptions = new()
+    {
+        new EventTypeFilterItem { Value = "All", Text = "All Events" },
+        new EventTypeFilterItem { Value = nameof(AttendanceEventType.CheckIn), Text = "Check In" },
+        new EventTypeFilterItem { Value = nameof(AttendanceEventType.CheckOut), Text = "Check Out" },
+        new EventTypeFilterItem { Value = nameof(AttendanceEventType.BreakStart), Text = "Break Start" },
+        new EventTypeFilterItem { Value = nameof(AttendanceEventType.BreakEnd), Text = "Break End" }
+    };
+
+    private List<BranchFilterItem> BranchFilterOptions = new();
+
+    protected override void OnInitialized()
+    {
+        Events = TestData.GetAttendanceEvents();
+        Employees = TestData.GetEmployees();
+        Departments = TestData.GetDepartments();
+        Branches = TestData.GetBranches();
+
+        BranchFilterOptions = new List<BranchFilterItem> { new BranchFilterItem { Id = null, Name = "All Branches" } };
+        BranchFilterOptions.AddRange(Branches.Select(b => new BranchFilterItem { Id = b.Id, Name = b.Name }));
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        EventTypeFilter = "All";
+        BranchFilter = null;
+        DateFilter = null;
+    }
+
+    private class EventTypeFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class BranchFilterItem
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}

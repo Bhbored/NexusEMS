@@ -106,4 +106,5 @@ public class Employee : EntityBase
         }
     }
     public bool IsActive => EmploymentStatus == EmploymentStatus.Active;
+    public string FullName => $"{FirstName} {LastName}";
 }

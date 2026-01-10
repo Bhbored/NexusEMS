@@ -1,0 +1,260 @@
+@page "/admin/salary-changes/{RequestId:guid}"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <div>
+                <h1 class="h2 fw-bold mb-1">Salary Change Request</h1>
+                <p class="text-muted mb-0">Review and approve salary changes</p>
+            </div>
+        </div>
+        @if (Request?.Status == SalaryChangeStatus.Submitted)
+        {
+            <div class="d-flex gap-2">
+                <button class="btn btn-danger" @onclick="RejectRequest">
+                    <i class="bi bi-x-circle me-2"></i>Reject
+                </button>
+                <button class="btn btn-success" @onclick="ApproveRequest">
+                    <i class="bi bi-check-circle me-2"></i>Approve
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Request != null && Employee != null)
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 mb-4">
+                <div class="card-header salary-change-detail-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-semibold">Employee Information</h5>
+                        <span class="badge salary-change-status-badge-@Request.Status.ToString().ToLower()">
+                            @Request.Status
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">Employee Name</label>
+                                <div class="salary-change-detail-value fw-bold">@Employee.FullName</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">Employee Code</label>
+                                <div class="salary-change-detail-value">@Employee.EmployeeCode</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">Position</label>
+                                <div class="salary-change-detail-value">@(Position?.Title ?? "N/A")</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">User Role</label>
+                                <span class="badge user-role-badge-@EmployeeUser?.Role.ToString().ToLower()">
+                                    @EmployeeUser?.Role
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">Change Reason</label>
+                                <div class="salary-change-detail-value">@(Request.Reason ?? "No reason provided")</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="salary-change-detail-field">
+                                <label class="salary-change-detail-label">Effective From</label>
+                                <div class="salary-change-detail-value">@Request.EffectiveFrom.ToString("MMMM dd, yyyy")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0">
+                <div class="card-header salary-change-detail-header">
+                    <h5 class="mb-0 fw-semibold">Salary Changes (@Request.Items.Count items)</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (Request.Items.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table salary-change-table">
+                                <thead>
+                                    <tr>
+                                        <th>Component</th>
+                                        <th>Action</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Request.Items)
+                                    {
+                                        <tr>
+                                            <td class="fw-medium">@item.ComponentType</td>
+                                            <td>
+                                                <span class="badge salary-change-action-badge-@item.Action.ToString().ToLower()">
+                                                    @item.Action
+                                                </span>
+                                            </td>
+                                            <td class="text-end fw-bold">@(item.Amount?.ToString("C") ?? "-")</td>
+                                            <td>
+                                                @if (item.IsDeduction == true)
+                                                {
+                                                    <span class="badge bg-danger">Deduction</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Earning</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-inbox empty-state-icon"></i>
+                            <p class="text-muted mb-0">No changes defined</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 mb-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-person me-2"></i>Request Details
+                    </h6>
+                    <div class="metadata-item">
+                        <small class="text-muted">Requested By</small>
+                        <div class="fw-medium">@RequestedBy?.Username</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Request Date</small>
+                        <div class="fw-medium">@Request.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+                    </div>
+                    @if (Request.ReviewedByUserId.HasValue)
+                    {
+                        <div class="metadata-item">
+                            <small class="text-muted">Reviewed By</small>
+                            <div class="fw-medium">@ReviewedBy?.Username</div>
+                        </div>
+                        <div class="metadata-item">
+                            <small class="text-muted">Review Date</small>
+                            <div class="fw-medium">@Request.ReviewedAtUtc?.ToString("MMM dd, yyyy HH:mm")</div>
+                        </div>
+                    }
+                    @if (Request.AppliedAtUtc.HasValue)
+                    {
+                        <div class="metadata-item">
+                            <small class="text-muted">Applied Date</small>
+                            <div class="fw-medium">@Request.AppliedAtUtc.Value.ToString("MMM dd, yyyy HH:mm")</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Request.Status == SalaryChangeStatus.Submitted)
+            {
+                <div class="card border-0 salary-change-action-card">
+                    <div class="card-body p-4">
+                        <h6 class="fw-semibold mb-3">
+                            <i class="bi bi-clipboard-check me-2"></i>Review Actions
+                        </h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" @onclick="ApproveRequest">
+                                <i class="bi bi-check-circle me-2"></i>Approve Request
+                            </button>
+                            <button class="btn btn-danger" @onclick="RejectRequest">
+                                <i class="bi bi-x-circle me-2"></i>Reject Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <LoadingSpinner />
+    </div>
+}
+
+@code {
+    [Parameter] public Guid RequestId { get; set; }
+
+    private SalaryChangeRequest? Request;
+    private Employee? Employee;
+    private Position? Position;
+    private User? EmployeeUser;
+    private User? RequestedBy;
+    private User? ReviewedBy;
+
+    protected override void OnInitialized()
+    {
+        Request = TestData.GetSalaryChangeRequests().FirstOrDefault(r => r.Id == RequestId);
+        
+        if (Request != null)
+        {
+            Employee = TestData.GetEmployees().FirstOrDefault(e => e.Id == Request.EmployeeProfileId);
+            Position = Employee?.PositionId.HasValue == true 
+                ? TestData.GetPositions().FirstOrDefault(p => p.Id == Employee.PositionId.Value)
+                : null;
+            EmployeeUser = TestData.GetUsers().FirstOrDefault(u => u.EmployeeProfileId == Employee?.Id);
+            RequestedBy = TestData.GetUsers().FirstOrDefault(u => u.Id == Request.RequestedByUserId);
+            ReviewedBy = Request.ReviewedByUserId.HasValue 
+                ? TestData.GetUsers().FirstOrDefault(u => u.Id == Request.ReviewedByUserId.Value)
+                : null;
+        }
+    }
+
+    private void ApproveRequest()
+    {
+        if (Request != null)
+        {
+            Request.Status = SalaryChangeStatus.Approved;
+            Request.ReviewedByUserId = Guid.NewGuid();
+            Request.ReviewedAtUtc = DateTime.UtcNow;
+            Request.UpdatedAt = DateTime.UtcNow;
+            Navigation.NavigateTo("/admin/salary-changes");
+        }
+    }
+
+    private void RejectRequest()
+    {
+        if (Request != null)
+        {
+            Request.Status = SalaryChangeStatus.Rejected;
+            Request.ReviewedByUserId = Guid.NewGuid();
+            Request.ReviewedAtUtc = DateTime.UtcNow;
+            Request.UpdatedAt = DateTime.UtcNow;
+            Navigation.NavigateTo("/admin/salary-changes");
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/salary-changes");
+}

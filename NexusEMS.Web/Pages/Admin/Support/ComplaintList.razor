@@ -1,0 +1,321 @@
+@page "/admin/complaints"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Complaint Management</h1>
+        <p class="text-muted mb-0">Review escalated complaints and monitor all cases</p>
+        <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Escalation Flow:</strong> Complaints flow from Employee → Department Chief → HR → Branch Manager → Admin. You see all complaints for monitoring, but only handle those forwarded by Branch Managers.
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card complaint-stat-card">
+            <div class="card-body">
+                <div class="complaint-stat-icon complaint-stat-icon-warning mb-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="complaint-stat-value">@AssignedToMe</div>
+                <div class="complaint-stat-label">Assigned to Me</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card complaint-stat-card">
+            <div class="card-body">
+                <div class="complaint-stat-icon complaint-stat-icon-primary mb-3">
+                    <i class="bi bi-eye"></i>
+                </div>
+                <div class="complaint-stat-value">@TotalComplaints</div>
+                <div class="complaint-stat-label">Total Complaints</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card complaint-stat-card">
+            <div class="card-body">
+                <div class="complaint-stat-icon complaint-stat-icon-success mb-3">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="complaint-stat-value">@ResolvedComplaints</div>
+                <div class="complaint-stat-label">Resolved</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card complaint-stat-card">
+            <div class="card-body">
+                <div class="complaint-stat-icon complaint-stat-icon-info mb-3">
+                    <i class="bi bi-arrow-up-circle"></i>
+                </div>
+                <div class="complaint-stat-value">@ForwardedFromBM</div>
+                <div class="complaint-stat-label">From BM</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs complaint-tabs mb-0">
+    <li class="nav-item">
+        <button class="nav-link @(ActiveTab == "assigned" ? "active" : "")" @onclick='() => ActiveTab = "assigned"'>
+            Assigned to Me (@AssignedToMe)
+        </button>
+    </li>
+    <li class="nav-item">
+        <button class="nav-link @(ActiveTab == "all" ? "active" : "")" @onclick='() => ActiveTab = "all"'>
+            All Complaints (@TotalComplaints)
+        </button>
+    </li>
+</ul>
+
+<div class="card border-0 complaint-tab-content">
+    <div class="card-header complaint-list-header">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group complaint-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search complaints..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <SfDropDownList TValue="string" TItem="StatusFilterItem"
+                              @bind-Value="StatusFilter"
+                              DataSource="@StatusFilterOptions"
+                              Placeholder="Filter by status"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-3">
+                <SfDropDownList TValue="string" TItem="SeverityFilterItem"
+                              @bind-Value="SeverityFilter"
+                              DataSource="@SeverityFilterOptions"
+                              Placeholder="Filter by severity"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (DisplayedComplaints.Any())
+        {
+            <SfGrid DataSource="@DisplayedComplaints" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="15"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn Field="@nameof(ComplaintCase.Subject)" HeaderText="Subject" Width="250"></GridColumn>
+                    <GridColumn HeaderText="Created By" Width="150">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                var employee = Employees.FirstOrDefault(e => e.Id == complaint.CreatedByEmployeeProfileId);
+                                <span>@employee?.FullName</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Severity" Width="120">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                var badgeClass = complaint.Severity switch
+                                {
+                                    ComplaintSeverity.Low => "bg-success",
+                                    ComplaintSeverity.Medium => "bg-warning",
+                                    ComplaintSeverity.High => "bg-danger",
+                                    ComplaintSeverity.Critical => "bg-dark",
+                                    _ => "bg-secondary"
+                                };
+                                <span class="badge @badgeClass">@complaint.Severity</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Status" Width="130">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                var badgeClass = complaint.Status switch
+                                {
+                                    ComplaintStatus.Submitted => "bg-primary",
+                                    ComplaintStatus.InReview => "bg-info",
+                                    ComplaintStatus.WaitingOnEmployee => "bg-warning",
+                                    ComplaintStatus.Resolved => "bg-success",
+                                    ComplaintStatus.Rejected => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                                <span class="badge @badgeClass">@complaint.Status</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Category" Width="120">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                <span class="small">@complaint.Category</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Escalation" Width="130">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                if (complaint.IsForwardedToBranchManager)
+                                {
+                                    <span class="badge bg-danger"><i class="bi bi-arrow-up"></i> To BM</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Level @GetEscalationLevel(complaint)</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(ComplaintCase.CreatedAt)" HeaderText="Created" Format="d" Width="120"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var complaint = (context as ComplaintCase)!;
+                                <button class="btn btn-sm btn-primary" @onclick="() => ViewDetails(complaint.Id)">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </button>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-chat-left-text complaint-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No complaints found</h5>
+                <p class="text-muted">
+                    @if (ActiveTab == "assigned")
+                    {
+                        <span>No complaints are currently assigned to you</span>
+                    }
+                    else
+                    {
+                        <span>No complaints match your filters</span>
+                    }
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<ComplaintCase> Complaints = new();
+    private List<Employee> Employees = new();
+    private string SearchTerm = string.Empty;
+    private string StatusFilter = "All";
+    private string SeverityFilter = "All";
+    private string ActiveTab = "assigned";
+    private Guid CurrentAdminUserId = Guid.NewGuid();
+
+    private List<ComplaintCase> DisplayedComplaints
+    {
+        get
+        {
+            var query = ActiveTab == "assigned"
+                ? Complaints.Where(c => c.AssignedToUserId == CurrentAdminUserId || c.IsForwardedToBranchManager)
+                : Complaints;
+
+            query = query.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(c =>
+                    c.Subject.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    c.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+                );
+            }
+
+            if (StatusFilter != "All")
+            {
+                var status = Enum.Parse<ComplaintStatus>(StatusFilter);
+                query = query.Where(c => c.Status == status);
+            }
+
+            if (SeverityFilter != "All")
+            {
+                var severity = Enum.Parse<ComplaintSeverity>(SeverityFilter);
+                query = query.Where(c => c.Severity == severity);
+            }
+
+            return query.OrderByDescending(c => c.CreatedAt).ToList();
+        }
+    }
+
+    private int AssignedToMe => Complaints.Count(c => c.AssignedToUserId == CurrentAdminUserId || c.IsForwardedToBranchManager);
+    private int TotalComplaints => Complaints.Count;
+    private int ResolvedComplaints => Complaints.Count(c => c.Status == ComplaintStatus.Resolved);
+    private int ForwardedFromBM => Complaints.Count(c => c.IsForwardedToBranchManager);
+
+    private List<StatusFilterItem> StatusFilterOptions = new()
+    {
+        new StatusFilterItem { Value = "All", Text = "All Statuses" },
+        new StatusFilterItem { Value = nameof(ComplaintStatus.Submitted), Text = "Submitted" },
+        new StatusFilterItem { Value = nameof(ComplaintStatus.InReview), Text = "In Review" },
+        new StatusFilterItem { Value = nameof(ComplaintStatus.WaitingOnEmployee), Text = "Waiting on Employee" },
+        new StatusFilterItem { Value = nameof(ComplaintStatus.Resolved), Text = "Resolved" },
+        new StatusFilterItem { Value = nameof(ComplaintStatus.Rejected), Text = "Rejected" }
+    };
+
+    private List<SeverityFilterItem> SeverityFilterOptions = new()
+    {
+        new SeverityFilterItem { Value = "All", Text = "All Severities" },
+        new SeverityFilterItem { Value = nameof(ComplaintSeverity.Low), Text = "Low" },
+        new SeverityFilterItem { Value = nameof(ComplaintSeverity.Medium), Text = "Medium" },
+        new SeverityFilterItem { Value = nameof(ComplaintSeverity.High), Text = "High" },
+        new SeverityFilterItem { Value = nameof(ComplaintSeverity.Critical), Text = "Critical" }
+    };
+
+    protected override void OnInitialized()
+    {
+        Complaints = TestData.GetComplaintCases();
+        Employees = TestData.GetEmployees();
+    }
+
+    private int GetEscalationLevel(ComplaintCase complaint)
+    {
+        if (complaint.IsForwardedToBranchManager) return 4;
+        if (complaint.Target == ComplaintTarget.HR) return 2;
+        return 1;
+    }
+
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/complaints/{id}");
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        StatusFilter = "All";
+        SeverityFilter = "All";
+    }
+
+    private class StatusFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class SeverityFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+}

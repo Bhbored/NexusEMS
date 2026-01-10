@@ -1,0 +1,136 @@
+.user-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.user-card:hover {
+    transform: translateY(-4px);
+}
+
+.user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--indigo), var(--purple));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.user-name {
+    color: var(--heading-color);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.user-email {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.user-role-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.user-role-admin {
+    background-color: var(--purple-50);
+    color: var(--purple);
+}
+
+.user-role-branchmanager {
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+}
+
+.user-role-departmentchief {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.user-role-humanresources {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+.user-role-accounting {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+.user-role-employee {
+    background-color: var(--badge-bg);
+    color: var(--badge-color);
+}
+
+.user-secondary-role-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    background-color: var(--badge-bg);
+    color: var(--badge-color);
+    border: 1px dashed var(--bs-border-color);
+}
+
+.user-status-online,
+.user-status-offline {
+    font-size: 0.5rem;
+}
+
+.user-status-online {
+    color: #10b981;
+}
+
+.user-status-offline {
+    color: var(--text-muted);
+}
+
+.user-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+.user-info-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--bs-body-color);
+}
+
+.user-info-item i {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.user-card-footer {
+    background-color: transparent;
+    border-top: 1px solid var(--bs-border-color);
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.user-action-btn {
+    flex: 1;
+    background-color: var(--bs-primary);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.user-action-btn:hover {
+    filter: brightness(110%);
+    transform: translateY(-2px);
+}

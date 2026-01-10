@@ -1,0 +1,267 @@
+@page "/admin/salary-configs/create"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Create Salary Configuration</h1>
+            <p class="text-muted mb-0">Define salary calculation rules and multipliers</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 mb-4">
+            <div class="card-header salary-config-form-header">
+                <h5 class="mb-0 fw-semibold">Configuration Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <EditForm Model="@NewConfig" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Configuration Name <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewConfig.Name" class="form-control" placeholder="e.g., Standard Engineering Salary" />
+                            <ValidationMessage For="@(() => NewConfig.Name)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-medium">Description</label>
+                            <InputTextArea @bind-Value="NewConfig.Description" class="form-control" rows="3" placeholder="Enter configuration description" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Branch Scope</label>
+                            <SfDropDownList TValue="Guid?" TItem="Branch"
+                                          @bind-Value="NewConfig.BranchId"
+                                          DataSource="@Branches"
+                                          Placeholder="Select branch (optional)"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                            <small class="text-muted">Leave empty for global config</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Department Scope</label>
+                            <SfDropDownList TValue="Guid?" TItem="Department"
+                                          @bind-Value="NewConfig.DepartmentId"
+                                          DataSource="@FilteredDepartments"
+                                          Enabled="@(NewConfig.BranchId.HasValue)"
+                                          Placeholder="Select department (optional)"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-semibold mb-3">Base Salary & Allowances</h6>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">Base Salary <span class="text-danger">*</span></label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.BaseSalary" 
+                                            Format="C0"
+                                            Min="0"
+                                            Placeholder="Base salary"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">HRA %</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.HraPercentage" 
+                                            Min="0m"
+                                            Max="100m"
+                                            Step="0.5m"
+                                            Placeholder="HRA percentage"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium">DA %</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.DaPercentage" 
+                                            Min="0m"
+                                            Max="100m"
+                                            Step="0.5m"
+                                            Placeholder="DA percentage"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Conveyance Allowance</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.ConveyanceAllowance" 
+                                            Format="C0"
+                                            Min="0"
+                                            Placeholder="Amount"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Medical Allowance</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.MedicalAllowance" 
+                                            Format="C0"
+                                            Min="0"
+                                            Placeholder="Amount"
+                                            CssClass="e-custom-numeric"
+                                            ShowSpinButton="false">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-semibold mb-3">Multipliers</h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Married Multiplier</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.MarriedMultiplier" 
+                                            Min="1m"
+                                            Max="2m"
+                                            Step="0.05m"
+                                            Format="N2"
+                                            Placeholder="1.10"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Per Child Multiplier</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.ChildMultiplier" 
+                                            Min="0m"
+                                            Max="1m"
+                                            Step="0.01m"
+                                            Format="N2"
+                                            Placeholder="0.05"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Post Graduate Multiplier</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.PostGraduateMultiplier" 
+                                            Min="1m"
+                                            Max="2m"
+                                            Step="0.05m"
+                                            Format="N2"
+                                            Placeholder="1.15"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">PhD Multiplier</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.PhdMultiplier" 
+                                            Min="1m"
+                                            Max="2m"
+                                            Step="0.05m"
+                                            Format="N2"
+                                            Placeholder="1.25"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">2-Year Increment %</label>
+                            <SfNumericTextBox TValue="decimal" @bind-Value="NewConfig.TwoYearIncrementPercentage" 
+                                            Min="0m"
+                                            Max="50m"
+                                            Step="1m"
+                                            Placeholder="5"
+                                            CssClass="e-custom-numeric">
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check mt-4">
+                                <InputCheckbox @bind-Value="NewConfig.IsActive" class="form-check-input" id="isActiveCheck" />
+                                <label class="form-check-label" for="isActiveCheck">
+                                    Active Configuration
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle me-2"></i>Create Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 salary-config-info-card">
+            <div class="card-body p-4">
+                <h6 class="fw-semibold mb-3">
+                    <i class="bi bi-info-circle me-2"></i>Configuration Tips
+                </h6>
+                <ul class="salary-config-tips-list">
+                    <li>
+                        <strong>Scope:</strong> Set branch/department for specific rules, or leave empty for global
+                    </li>
+                    <li>
+                        <strong>Base Salary:</strong> Starting salary before any additions
+                    </li>
+                    <li>
+                        <strong>HRA/DA:</strong> Percentage of base salary
+                    </li>
+                    <li>
+                        <strong>Multipliers:</strong> Applied to base for employee circumstances
+                    </li>
+                    <li>
+                        <strong>Increment:</strong> Automatic raise after 2 years
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SalaryConfiguration NewConfig = new() { IsActive = true, MarriedMultiplier = 1.1m, ChildMultiplier = 0.05m, PostGraduateMultiplier = 1.15m, PhdMultiplier = 1.25m, TwoYearIncrementPercentage = 5m };
+    private List<Branch> Branches = new();
+    private List<Department> Departments = new();
+
+    private List<Department> FilteredDepartments =>
+        NewConfig.BranchId.HasValue
+            ? Departments.Where(d => d.BranchId == NewConfig.BranchId.Value).ToList()
+            : new List<Department>();
+
+    protected override void OnInitialized()
+    {
+        Branches = TestData.GetBranches();
+        Departments = TestData.GetDepartments();
+    }
+
+    private void HandleSubmit()
+    {
+        NewConfig.Id = Guid.NewGuid();
+        NewConfig.CreatedAt = DateTime.UtcNow;
+        NewConfig.UpdatedAt = DateTime.UtcNow;
+        
+        TestData.GetSalaryConfigurations().Add(NewConfig);
+        
+        Navigation.NavigateTo("/admin/salary-configs");
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/salary-configs");
+}

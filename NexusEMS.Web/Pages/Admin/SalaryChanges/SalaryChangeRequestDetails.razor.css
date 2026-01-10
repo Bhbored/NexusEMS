@@ -1,0 +1,114 @@
+.salary-change-detail-header {
+    background-color: transparent;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding: 1.25rem 1.5rem;
+}
+
+.salary-change-status-badge-draft {
+    background-color: var(--badge-bg);
+    color: var(--badge-color);
+}
+
+.salary-change-status-badge-submitted {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+.salary-change-status-badge-approved {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.salary-change-status-badge-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.salary-change-status-badge-applied {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.salary-change-detail-field {
+    margin-bottom: 0;
+}
+
+.salary-change-detail-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.salary-change-detail-value {
+    color: var(--bs-body-color);
+    font-size: 1rem;
+}
+
+.user-role-badge-branchmanager {
+    background-color: var(--indigo-50);
+    color: var(--indigo);
+}
+
+.user-role-badge-departmentchief {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.user-role-badge-humanresources {
+    background-color: var(--cyan-50);
+    color: var(--cyan);
+}
+
+.user-role-badge-accounting {
+    background-color: var(--orange-50);
+    color: var(--orange);
+}
+
+.salary-change-table {
+    margin-bottom: 0;
+}
+
+.salary-change-table thead {
+    background-color: var(--table-striped-bg);
+}
+
+.salary-change-action-badge-add {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+.salary-change-action-badge-update {
+    background-color: var(--blue-50);
+    color: var(--blue);
+}
+
+.salary-change-action-badge-remove {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.metadata-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.metadata-item:last-child {
+    border-bottom: none;
+}
+
+.metadata-item small {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.salary-change-action-card {
+    border: 2px solid var(--bs-primary);
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+}

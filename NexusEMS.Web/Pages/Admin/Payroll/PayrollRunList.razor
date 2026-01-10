@@ -1,0 +1,230 @@
+@page "/admin/payroll-runs"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Payroll Runs</h1>
+        <p class="text-muted mb-0">View and monitor monthly payroll processing</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card payroll-stat-card">
+            <div class="card-body">
+                <div class="payroll-stat-icon payroll-stat-icon-primary mb-3">
+                    <i class="bi bi-calendar3"></i>
+                </div>
+                <div class="payroll-stat-value">@PayrollRuns.Count</div>
+                <div class="payroll-stat-label">Total Runs</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card payroll-stat-card">
+            <div class="card-body">
+                <div class="payroll-stat-icon payroll-stat-icon-success mb-3">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="payroll-stat-value">@PaidRuns</div>
+                <div class="payroll-stat-label">Completed</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card payroll-stat-card">
+            <div class="card-body">
+                <div class="payroll-stat-icon payroll-stat-icon-warning mb-3">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div class="payroll-stat-value">@DraftRuns</div>
+                <div class="payroll-stat-label">In Progress</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card payroll-stat-card">
+            <div class="card-body">
+                <div class="payroll-stat-icon payroll-stat-icon-info mb-3">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <div class="payroll-stat-value">@TotalSlips</div>
+                <div class="payroll-stat-label">Total Slips</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header payroll-list-header">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group payroll-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search payroll runs..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-4">
+                <SfDropDownList TValue="string" TItem="StatusFilterItem"
+                              @bind-Value="StatusFilter"
+                              DataSource="@StatusFilterOptions"
+                              Placeholder="Filter by status"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredPayrollRuns.Any())
+        {
+            <SfGrid DataSource="@FilteredPayrollRuns" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="15"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="Period" Width="200">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                <div>
+                                    <div class="fw-bold">@run.PeriodStart.ToString("MMM dd") - @run.PeriodEnd.ToString("MMM dd, yyyy")</div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Status" Width="130">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                var badgeClass = run.Status switch
+                                {
+                                    PayrollRunStatus.Draft => "bg-secondary",
+                                    PayrollRunStatus.Finalized => "bg-warning",
+                                    PayrollRunStatus.Paid => "bg-success",
+                                    _ => "bg-secondary"
+                                };
+                                <span class="badge @badgeClass">@run.Status</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Slips" Width="100">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                <span class="badge bg-primary">@run.SalarySlips.Count</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Created By" Width="150">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                var creator = Users.FirstOrDefault(u => u.Id == run.CreatedByUserId);
+                                <span>@creator?.Username</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(PayrollRun.CreatedAt)" HeaderText="Created Date" Format="d" Width="130"></GridColumn>
+                    <GridColumn HeaderText="Finalized" Width="130">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                if (run.FinalizedAtUtc.HasValue)
+                                {
+                                    <span>@run.FinalizedAtUtc.Value.ToString("MMM dd, yyyy")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var run = (context as PayrollRun)!;
+                                <button class="btn btn-sm btn-primary" @onclick="() => ViewDetails(run.Id)">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </button>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-check payroll-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No payroll runs found</h5>
+                <p class="text-muted">Payroll runs are created by the Accounting department</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<PayrollRun> PayrollRuns = new();
+    private List<User> Users = new();
+    private string SearchTerm = string.Empty;
+    private string StatusFilter = "All";
+
+    private List<PayrollRun> FilteredPayrollRuns
+    {
+        get
+        {
+            var query = PayrollRuns.AsEnumerable();
+
+            if (StatusFilter != "All")
+            {
+                var status = Enum.Parse<PayrollRunStatus>(StatusFilter);
+                query = query.Where(r => r.Status == status);
+            }
+
+            return query.OrderByDescending(r => r.CreatedAt).ToList();
+        }
+    }
+
+    private int PaidRuns => PayrollRuns.Count(r => r.Status == PayrollRunStatus.Paid);
+    private int DraftRuns => PayrollRuns.Count(r => r.Status == PayrollRunStatus.Draft);
+    private int TotalSlips => PayrollRuns.Sum(r => r.SalarySlips.Count);
+
+    private List<StatusFilterItem> StatusFilterOptions = new()
+    {
+        new StatusFilterItem { Value = "All", Text = "All Statuses" },
+        new StatusFilterItem { Value = nameof(PayrollRunStatus.Draft), Text = "Draft" },
+        new StatusFilterItem { Value = nameof(PayrollRunStatus.Finalized), Text = "Finalized" },
+        new StatusFilterItem { Value = nameof(PayrollRunStatus.Paid), Text = "Paid" }
+    };
+
+    protected override void OnInitialized()
+    {
+        PayrollRuns = TestData.GetPayrollRuns();
+        Users = TestData.GetUsers();
+    }
+
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/payroll-runs/{id}");
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        StatusFilter = "All";
+    }
+
+    private class StatusFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+}

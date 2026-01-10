@@ -1,0 +1,295 @@
+@page "/admin/users/edit/{UserId:guid}"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Edit User</h1>
+            <p class="text-muted mb-0">Update user account and permissions</p>
+        </div>
+    </div>
+</div>
+
+@if (UserModel != null)
+{
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 mb-4">
+                <div class="card-header user-form-header">
+                    <h5 class="mb-0 fw-semibold">Account Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <EditForm Model="@UserModel" OnValidSubmit="HandleSubmit">
+                        <DataAnnotationsValidator />
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Username <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="UserModel.Username" class="form-control" placeholder="Enter username" />
+                                <ValidationMessage For="@(() => UserModel.Username)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Email <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="UserModel.Email" class="form-control" type="email" placeholder="user@example.com" />
+                                <ValidationMessage For="@(() => UserModel.Email)" class="text-danger small" />
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" @bind="ChangePassword" id="changePasswordCheck">
+                                    <label class="form-check-label" for="changePasswordCheck">
+                                        Change Password
+                                    </label>
+                                </div>
+                            </div>
+
+                            @if (ChangePassword)
+                            {
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">New Password</label>
+                                    <InputText @bind-Value="NewPassword" class="form-control" type="password" placeholder="Enter new password" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Confirm Password</label>
+                                    <InputText @bind-Value="ConfirmPassword" class="form-control" type="password" placeholder="Confirm password" />
+                                    @if (!string.IsNullOrEmpty(NewPassword) && !string.IsNullOrEmpty(ConfirmPassword) && NewPassword != ConfirmPassword)
+                                    {
+                                        <small class="text-danger">Passwords do not match</small>
+                                    }
+                                </div>
+                            }
+
+                            <div class="col-12">
+                                <hr class="my-3" />
+                                <h6 class="fw-semibold mb-3">Role Assignment</h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Primary Role <span class="text-danger">*</span></label>
+                                <SfDropDownList TValue="UserRole" TItem="RoleItem"
+                                              @bind-Value="UserModel.Role"
+                                              DataSource="@RoleOptions"
+                                              Placeholder="Select primary role"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Secondary Role</label>
+                                <SfDropDownList TValue="UserRole?" TItem="SecondaryRoleItem"
+                                              @bind-Value="UserModel.SecondaryRole"
+                                              DataSource="@SecondaryRoleOptions"
+                                              Placeholder="Select secondary role"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Branch</label>
+                                <SfDropDownList TValue="Guid?" TItem="Branch"
+                                              @bind-Value="UserModel.BranchId"
+                                              DataSource="@Branches"
+                                              Placeholder="Select branch"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Department</label>
+                                <SfDropDownList TValue="Guid?" TItem="Department"
+                                              @bind-Value="UserModel.DepartmentId"
+                                              DataSource="@FilteredDepartments"
+                                              Enabled="@(UserModel.BranchId.HasValue)"
+                                              Placeholder="Select department"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium">Link to Employee</label>
+                                <SfDropDownList TValue="Guid?" TItem="Employee"
+                                              @bind-Value="UserModel.EmployeeProfileId"
+                                              DataSource="@FilteredEmployees"
+                                              Enabled="@(UserModel.BranchId.HasValue)"
+                                              Placeholder="Select employee profile"
+                                              CssClass="e-custom-dropdown">
+                                    <DropDownListFieldSettings Value="Id" Text="@nameof(Employee.FullName)"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-danger" @onclick="DeleteUser">
+                                        <i class="bi bi-trash me-2"></i>Delete User
+                                    </button>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                            <i class="bi bi-x-circle me-2"></i>Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>Save Changes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 mb-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-activity me-2"></i>Activity Status
+                    </h6>
+                    <div class="user-status-item">
+                        <span class="user-status-label">Account Status</span>
+                        <span class="badge @(UserModel.IsOnline ? "bg-success" : "bg-secondary")">
+                            @(UserModel.IsOnline ? "Online" : "Offline")
+                        </span>
+                    </div>
+                    @if (UserModel.LastLoginAt.HasValue)
+                    {
+                        <div class="user-status-item">
+                            <span class="user-status-label">Last Login</span>
+                            <span class="user-status-value">@UserModel.LastLoginAt</span>
+                        </div>
+                    }
+                    @if (UserModel.LastLogoutAt.HasValue)
+                    {
+                        <div class="user-status-item">
+                            <span class="user-status-label">Last Logout</span>
+                            <span class="user-status-value">@UserModel.LastLogoutAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card border-0">
+                <div class="card-body p-4">
+                    <h6 class="fw-semibold mb-3">
+                        <i class="bi bi-clock-history me-2"></i>Metadata
+                    </h6>
+                    <div class="metadata-item">
+                        <small class="text-muted">Created</small>
+                        <div class="fw-medium">@UserModel.CreatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">Last Updated</small>
+                        <div class="fw-medium">@UserModel.UpdatedAt</div>
+                    </div>
+                    <div class="metadata-item">
+                        <small class="text-muted">User ID</small>
+                        <div class="fw-medium small">@UserModel.Id</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ConfirmationDialog @ref="DeleteConfirmation" Title="Delete User"
+                        Message="@($"Are you sure you want to delete {UserModel.Username}? This action cannot be undone.")" 
+                        OnConfirmation="OnDeleteConfirmed" />
+}
+else
+{
+    <div class="text-center py-5">
+        <LoadingSpinner />
+    </div>
+}
+
+@code {
+    [Parameter] public Guid UserId { get; set; }
+
+    private User? UserModel;
+    private bool ChangePassword;
+    private string NewPassword = string.Empty;
+    private string ConfirmPassword = string.Empty;
+    private ConfirmationDialog DeleteConfirmation = new();
+
+    private List<Branch> Branches = new();
+    private List<Department> Departments = new();
+    private List<Employee> Employees = new();
+
+    private List<Department> FilteredDepartments =>
+        UserModel?.BranchId.HasValue == true
+            ? Departments.Where(d => d.BranchId == UserModel.BranchId.Value).ToList()
+            : new List<Department>();
+
+    private List<Employee> FilteredEmployees =>
+        UserModel?.BranchId.HasValue == true
+            ? Employees.Where(e => e.BranchId == UserModel.BranchId.Value && (e.AssignedToUserId == null || e.AssignedToUserId == UserId)).ToList()
+            : new List<Employee>();
+
+    private List<RoleItem> RoleOptions = Enum.GetValues<UserRole>()
+        .Select(r => new RoleItem { Value = r, Text = r.ToString() })
+        .ToList();
+
+    private List<SecondaryRoleItem> SecondaryRoleOptions = new List<SecondaryRoleItem>
+    {
+        new SecondaryRoleItem { Value = null, Text = "None" }
+    }.Concat(Enum.GetValues<UserRole>()
+        .Select(r => new SecondaryRoleItem { Value = r, Text = r.ToString() }))
+        .ToList();
+
+    protected override void OnInitialized()
+    {
+        UserModel = TestData.GetUsers().FirstOrDefault(u => u.Id == UserId);
+        Branches = TestData.GetBranches();
+        Departments = TestData.GetDepartments();
+        Employees = TestData.GetEmployees();
+    }
+
+    private void HandleSubmit()
+    {
+        if (UserModel != null)
+        {
+            if (ChangePassword && !string.IsNullOrEmpty(NewPassword) && NewPassword == ConfirmPassword)
+            {
+                UserModel.PasswordHash = NewPassword;
+            }
+
+            UserModel.UpdatedAt = DateTime.UtcNow;
+            Navigation.NavigateTo("/admin/users");
+        }
+    }
+
+    private void DeleteUser() => DeleteConfirmation.Show();
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && UserModel != null)
+        {
+            TestData.GetUsers().Remove(UserModel);
+            Navigation.NavigateTo("/admin/users");
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/users");
+
+    private class RoleItem
+    {
+        public UserRole Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class SecondaryRoleItem
+    {
+        public UserRole? Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+}

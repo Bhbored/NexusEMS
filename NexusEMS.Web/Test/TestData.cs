@@ -148,22 +148,566 @@ public static class TestData
         Departments[7].Chief = Employees[13];
     }
 
-    // Placeholder lists for other models
-    public static List<SalaryConfiguration> SalaryConfigurations = new();
+    public static List<SalaryConfiguration> SalaryConfigurations = new()
+    {
+        new SalaryConfiguration
+        {
+            Id = Guid.NewGuid(),
+            BranchId = Branches[0].Id,
+            Name = "North Branch Standard",
+            Description = "Standard salary configuration for North Branch",
+            BaseSalary = 60000,
+            HraPercentage = 20,
+            DaPercentage = 10,
+            ConveyanceAllowance = 2000,
+            MedicalAllowance = 1500,
+            MarriedMultiplier = 1.1m,
+            ChildMultiplier = 0.05m,
+            PostGraduateMultiplier = 1.15m,
+            PhdMultiplier = 1.25m,
+            TwoYearIncrementPercentage = 5,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow.AddMonths(-6),
+            UpdatedAt = DateTime.UtcNow.AddMonths(-6)
+        },
+        new SalaryConfiguration
+        {
+            Id = Guid.NewGuid(),
+            BranchId = Branches[1].Id,
+            Name = "South Branch Standard",
+            Description = "Standard salary configuration for South Branch",
+            BaseSalary = 65000,
+            HraPercentage = 22,
+            DaPercentage = 12,
+            ConveyanceAllowance = 2200,
+            MedicalAllowance = 1600,
+            MarriedMultiplier = 1.1m,
+            ChildMultiplier = 0.05m,
+            PostGraduateMultiplier = 1.15m,
+            PhdMultiplier = 1.25m,
+            TwoYearIncrementPercentage = 5,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow.AddMonths(-5),
+            UpdatedAt = DateTime.UtcNow.AddMonths(-5)
+        },
+        new SalaryConfiguration
+        {
+            Id = Guid.NewGuid(),
+            DepartmentId = Departments[0].Id,
+            Name = "Engineering Department",
+            Description = "Specialized configuration for Engineering department",
+            BaseSalary = 70000,
+            HraPercentage = 20,
+            DaPercentage = 10,
+            ConveyanceAllowance = 2500,
+            MedicalAllowance = 2000,
+            MarriedMultiplier = 1.12m,
+            ChildMultiplier = 0.06m,
+            PostGraduateMultiplier = 1.20m,
+            PhdMultiplier = 1.30m,
+            TwoYearIncrementPercentage = 6,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow.AddMonths(-4),
+            UpdatedAt = DateTime.UtcNow.AddMonths(-4)
+        }
+    };
+
     public static List<SalaryPackage> SalaryPackages = new();
     public static List<SalaryComponent> SalaryComponents = new();
-    public static List<SalaryChangeRequest> SalaryChangeRequests = new();
-    public static List<SalaryChangeItem> SalaryChangeItems = new();
-    public static List<PayrollRun> PayrollRuns = new();
+
+    public static List<SalaryChangeItem> SalaryChangeItems = new()
+    {
+        new SalaryChangeItem
+        {
+            Id = Guid.NewGuid(),
+            ComponentType = SalaryComponentType.Base,
+            Action = SalaryChangeItemAction.AddOrUpdate,
+            Amount = 90000,
+            IsDeduction = false,
+            Source = SalaryComponentSource.Manual,
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-10)
+        },
+        new SalaryChangeItem
+        {
+            Id = Guid.NewGuid(),
+            ComponentType = SalaryComponentType.Bonus,
+            Action = SalaryChangeItemAction.AddOrUpdate,
+            Amount = 5000,
+            IsDeduction = false,
+            Source = SalaryComponentSource.Manual,
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-10)
+        },
+        new SalaryChangeItem
+        {
+            Id = Guid.NewGuid(),
+            ComponentType = SalaryComponentType.Base,
+            Action = SalaryChangeItemAction.AddOrUpdate,
+            Amount = 110000,
+            IsDeduction = false,
+            Source = SalaryComponentSource.Manual,
+            CreatedAt = DateTime.UtcNow.AddDays(-5),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5)
+        }
+    };
+
+    public static List<SalaryChangeRequest> SalaryChangeRequests = new()
+    {
+        new SalaryChangeRequest
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[6].Id,
+            Status = SalaryChangeStatus.Submitted,
+            RequestedByUserId = Users[12].Id,
+            Reason = "Performance-based salary increase for Department Chief",
+            EffectiveFrom = DateOnly.FromDateTime(DateTime.Today.AddMonths(1)),
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-10),
+            Items = new List<SalaryChangeItem> { SalaryChangeItems[0], SalaryChangeItems[1] }
+        },
+        new SalaryChangeRequest
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[1].Id,
+            Status = SalaryChangeStatus.Submitted,
+            RequestedByUserId = Users[12].Id,
+            Reason = "Annual increment for Branch Manager",
+            EffectiveFrom = DateOnly.FromDateTime(DateTime.Today.AddMonths(1)),
+            CreatedAt = DateTime.UtcNow.AddDays(-5),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5),
+            Items = new List<SalaryChangeItem> { SalaryChangeItems[2] }
+        },
+        new SalaryChangeRequest
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[10].Id,
+            Status = SalaryChangeStatus.Approved,
+            RequestedByUserId = Users[12].Id,
+            ReviewedByUserId = Users[0].Id,
+            Reason = "HR Chief promotion salary adjustment",
+            EffectiveFrom = DateOnly.FromDateTime(DateTime.Today),
+            ReviewedAtUtc = DateTime.UtcNow.AddDays(-2),
+            CreatedAt = DateTime.UtcNow.AddDays(-15),
+            UpdatedAt = DateTime.UtcNow.AddDays(-2),
+            Items = new List<SalaryChangeItem>()
+        }
+    };
+
     public static List<SalarySlipSnapshot> SalarySlipSnapshots = new();
-    public static List<WeeklyRating> WeeklyRatings = new();
+
+    public static List<PayrollRun> PayrollRuns = new()
+    {
+        new PayrollRun
+        {
+            Id = Guid.NewGuid(),
+            PeriodStart = new DateOnly(2026, 1, 1),
+            PeriodEnd = new DateOnly(2026, 1, 31),
+            Status = PayrollRunStatus.Paid,
+            CreatedByUserId = Users[12].Id,
+            FinalizedAtUtc = DateTime.UtcNow.AddDays(-5),
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5),
+            SalarySlips = new List<SalarySlipSnapshot>()
+        },
+        new PayrollRun
+        {
+            Id = Guid.NewGuid(),
+            PeriodStart = new DateOnly(2025, 12, 1),
+            PeriodEnd = new DateOnly(2025, 12, 31),
+            Status = PayrollRunStatus.Paid,
+            CreatedByUserId = Users[12].Id,
+            FinalizedAtUtc = DateTime.UtcNow.AddDays(-35),
+            CreatedAt = DateTime.UtcNow.AddDays(-40),
+            UpdatedAt = DateTime.UtcNow.AddDays(-35),
+            SalarySlips = new List<SalarySlipSnapshot>()
+        },
+        new PayrollRun
+        {
+            Id = Guid.NewGuid(),
+            PeriodStart = new DateOnly(2026, 2, 1),
+            PeriodEnd = new DateOnly(2026, 2, 28),
+            Status = PayrollRunStatus.Draft,
+            CreatedByUserId = Users[12].Id,
+            CreatedAt = DateTime.UtcNow.AddDays(-2),
+            UpdatedAt = DateTime.UtcNow.AddDays(-2),
+            SalarySlips = new List<SalarySlipSnapshot>()
+        }
+    };
+
     public static List<WeeklyRatingRevision> WeeklyRatingRevisions = new();
-    public static List<WorkSchedule> WorkSchedules = new();
+
+    public static List<WeeklyRating> WeeklyRatings = new()
+    {
+        new WeeklyRating
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[14].Id,
+            WeekStartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek)),
+            CreatedByUserId = Users[6].Id,
+            IsFinalized = false,
+            CreatedAt = DateTime.UtcNow.AddDays(-2),
+            UpdatedAt = DateTime.UtcNow.AddDays(-2),
+            Revisions = new List<WeeklyRatingRevision>()
+        },
+        new WeeklyRating
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[15].Id,
+            WeekStartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek - 7)),
+            CreatedByUserId = Users[6].Id,
+            IsFinalized = true,
+            CreatedAt = DateTime.UtcNow.AddDays(-9),
+            UpdatedAt = DateTime.UtcNow.AddDays(-8),
+            Revisions = new List<WeeklyRatingRevision>()
+        },
+        new WeeklyRating
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[16].Id,
+            WeekStartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek)),
+            CreatedByUserId = Users[6].Id,
+            IsFinalized = true,
+            CreatedAt = DateTime.UtcNow.AddDays(-3),
+            UpdatedAt = DateTime.UtcNow.AddDays(-1),
+            Revisions = new List<WeeklyRatingRevision>()
+        }
+    };
+
     public static List<WorkScheduleAssignment> WorkScheduleAssignments = new();
-    public static List<ComplaintCase> ComplaintCases = new();
+
+    public static List<WorkSchedule> WorkSchedules = new()
+    {
+        new WorkSchedule
+        {
+            Id = Guid.NewGuid(),
+            DepartmentId = Departments[0].Id,
+            CreatedByUserId = Users[6].Id,
+            Title = "Engineering Q1 Schedule",
+            PeriodStart = new DateOnly(2026, 1, 1),
+            PeriodEnd = new DateOnly(2026, 3, 31),
+            Description = "Q1 work schedule for Engineering department",
+            Status = WorkScheduleStatus.Approved,
+            ApprovedByUserId = Users[1].Id,
+            SubmittedAtUtc = DateTime.UtcNow.AddDays(-20),
+            ApprovedAtUtc = DateTime.UtcNow.AddDays(-15),
+            ScheduleDataJson = "{}",
+            CreatedAt = DateTime.UtcNow.AddDays(-25),
+            UpdatedAt = DateTime.UtcNow.AddDays(-15),
+            Assignments = new List<WorkScheduleAssignment>()
+        },
+        new WorkSchedule
+        {
+            Id = Guid.NewGuid(),
+            DepartmentId = Departments[1].Id,
+            CreatedByUserId = Users[7].Id,
+            Title = "Marketing Q1 Schedule",
+            PeriodStart = new DateOnly(2026, 1, 1),
+            PeriodEnd = new DateOnly(2026, 3, 31),
+            Description = "Q1 work schedule for Marketing department",
+            Status = WorkScheduleStatus.Submitted,
+            SubmittedAtUtc = DateTime.UtcNow.AddDays(-5),
+            ScheduleDataJson = "{}",
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-5),
+            Assignments = new List<WorkScheduleAssignment>()
+        },
+        new WorkSchedule
+        {
+            Id = Guid.NewGuid(),
+            DepartmentId = Departments[4].Id,
+            CreatedByUserId = Users[8].Id,
+            Title = "Engineering South Q1",
+            PeriodStart = new DateOnly(2026, 1, 1),
+            PeriodEnd = new DateOnly(2026, 3, 31),
+            Description = "Q1 work schedule for South Engineering",
+            Status = WorkScheduleStatus.Published,
+            ApprovedByUserId = Users[2].Id,
+            SubmittedAtUtc = DateTime.UtcNow.AddDays(-18),
+            ApprovedAtUtc = DateTime.UtcNow.AddDays(-12),
+            ScheduleDataJson = "{}",
+            CreatedAt = DateTime.UtcNow.AddDays(-22),
+            UpdatedAt = DateTime.UtcNow.AddDays(-12),
+            Assignments = new List<WorkScheduleAssignment>()
+        }
+    };
+
     public static List<ComplaintMessage> ComplaintMessages = new();
     public static List<ComplaintAttachment> ComplaintAttachments = new();
-    public static List<AttendanceEvent> AttendanceEvents = new();
-    public static List<SessionLog> SessionLogs = new();
-    public static List<AuditLog> AuditLogs = new();
+
+    public static List<ComplaintCase> ComplaintCases = new()
+    {
+        new ComplaintCase
+        {
+            Id = Guid.NewGuid(),
+            CreatedByEmployeeProfileId = Employees[14].Id,
+            DepartmentId = Departments[0].Id,
+            BranchId = Branches[0].Id,
+            Subject = "Workplace Environment Issue",
+            Description = "The air conditioning in the engineering office has been malfunctioning for two weeks.",
+            Target = ComplaintTarget.HR,
+            Category = ComplaintCategory.Policy,
+            Severity = ComplaintSeverity.Medium,
+            Status = ComplaintStatus.InReview,
+            IsAnonymousToChief = false,
+            AssignedToUserId = Users[10].Id,
+            IsForwardedToBranchManager = false,
+            CreatedAt = DateTime.UtcNow.AddDays(-5),
+            UpdatedAt = DateTime.UtcNow.AddDays(-3),
+            Messages = new List<ComplaintMessage>(),
+            Attachments = new List<ComplaintAttachment>()
+        },
+        new ComplaintCase
+        {
+            Id = Guid.NewGuid(),
+            CreatedByEmployeeProfileId = Employees[15].Id,
+            DepartmentId = Departments[0].Id,
+            BranchId = Branches[0].Id,
+            Subject = "Equipment Request Delayed",
+            Description = "Requested new laptop three months ago, still waiting for approval.",
+            Target = ComplaintTarget.BranchManager,
+            Category = ComplaintCategory.IT,
+            Severity = ComplaintSeverity.High,
+            Status = ComplaintStatus.Submitted,
+            IsAnonymousToChief = false,
+            AssignedToUserId = Users[6].Id,
+            IsForwardedToBranchManager = true,
+            ForwardedByUserId = Users[6].Id,
+            ForwardedAtUtc = DateTime.UtcNow.AddDays(-2),
+            ForwardingNotes = "Employee needs urgent equipment upgrade for project work.",
+            CreatedAt = DateTime.UtcNow.AddDays(-10),
+            UpdatedAt = DateTime.UtcNow.AddDays(-2),
+            Messages = new List<ComplaintMessage>(),
+            Attachments = new List<ComplaintAttachment>()
+        },
+        new ComplaintCase
+        {
+            Id = Guid.NewGuid(),
+            CreatedByEmployeeProfileId = Employees[19].Id,
+            DepartmentId = Departments[1].Id,
+            BranchId = Branches[0].Id,
+            Subject = "Salary Discrepancy",
+            Description = "Last month's salary was calculated incorrectly.",
+            Target = ComplaintTarget.HR,
+            Category = ComplaintCategory.Payroll,
+            Severity = ComplaintSeverity.Critical,
+            Status = ComplaintStatus.Resolved,
+            IsAnonymousToChief = false,
+            AssignedToUserId = Users[12].Id,
+            ClosedAtUtc = DateTime.UtcNow.AddDays(-1),
+            CreatedAt = DateTime.UtcNow.AddDays(-8),
+            UpdatedAt = DateTime.UtcNow.AddDays(-1),
+            Messages = new List<ComplaintMessage>(),
+            Attachments = new List<ComplaintAttachment>()
+        }
+    };
+
+    public static List<AttendanceEvent> AttendanceEvents = new()
+    {
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[14].Id,
+            Timestamp = DateTime.Today.AddHours(9),
+            EventType = AttendanceEventType.CheckIn,
+            VerificationMethod = VerificationMethod.FaceRecognition,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch - Main Entrance",
+            CreatedAt = DateTime.Today.AddHours(9),
+            UpdatedAt = DateTime.Today.AddHours(9)
+        },
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[15].Id,
+            Timestamp = DateTime.Today.AddHours(8).AddMinutes(55),
+            EventType = AttendanceEventType.CheckIn,
+            VerificationMethod = VerificationMethod.FaceRecognition,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch - Main Entrance",
+            CreatedAt = DateTime.Today.AddHours(8).AddMinutes(55),
+            UpdatedAt = DateTime.Today.AddHours(8).AddMinutes(55)
+        },
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[16].Id,
+            Timestamp = DateTime.Today.AddHours(9).AddMinutes(10),
+            EventType = AttendanceEventType.CheckIn,
+            VerificationMethod = VerificationMethod.FaceRecognition,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch - Main Entrance",
+            CreatedAt = DateTime.Today.AddHours(9).AddMinutes(10),
+            UpdatedAt = DateTime.Today.AddHours(9).AddMinutes(10)
+        },
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[14].Id,
+            Timestamp = DateTime.Today.AddHours(12),
+            EventType = AttendanceEventType.BreakStart,
+            VerificationMethod = VerificationMethod.Manual,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch",
+            CreatedAt = DateTime.Today.AddHours(12),
+            UpdatedAt = DateTime.Today.AddHours(12)
+        },
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[14].Id,
+            Timestamp = DateTime.Today.AddHours(13),
+            EventType = AttendanceEventType.BreakEnd,
+            VerificationMethod = VerificationMethod.Manual,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch",
+            CreatedAt = DateTime.Today.AddHours(13),
+            UpdatedAt = DateTime.Today.AddHours(13)
+        },
+        new AttendanceEvent
+        {
+            Id = Guid.NewGuid(),
+            EmployeeProfileId = Employees[15].Id,
+            Timestamp = DateTime.Today.AddHours(17),
+            EventType = AttendanceEventType.CheckOut,
+            VerificationMethod = VerificationMethod.FaceRecognition,
+            DeviceId = "DEVICE001",
+            LocationLabel = "North Branch - Main Entrance",
+            CreatedAt = DateTime.Today.AddHours(17),
+            UpdatedAt = DateTime.Today.AddHours(17)
+        }
+    };
+
+    public static List<SessionLog> SessionLogs = new()
+    {
+        new SessionLog
+        {
+            Id = Guid.NewGuid(),
+            UserId = Users[0].Id,
+            LoginAt = DateTime.UtcNow.AddHours(-2),
+            LogoutAt = null,
+            IpAddress = "192.168.1.100",
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0",
+            DeviceInfo = "Windows 10 Desktop",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow.AddHours(-2),
+            UpdatedAt = DateTime.UtcNow.AddHours(-2)
+        },
+        new SessionLog
+        {
+            Id = Guid.NewGuid(),
+            UserId = Users[1].Id,
+            LoginAt = DateTime.UtcNow.AddHours(-4),
+            LogoutAt = DateTime.UtcNow.AddHours(-1),
+            IpAddress = "192.168.1.101",
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0",
+            DeviceInfo = "Windows 11 Laptop",
+            IsActive = false,
+            CreatedAt = DateTime.UtcNow.AddHours(-4),
+            UpdatedAt = DateTime.UtcNow.AddHours(-1)
+        },
+        new SessionLog
+        {
+            Id = Guid.NewGuid(),
+            UserId = Users[6].Id,
+            LoginAt = DateTime.UtcNow.AddHours(-3),
+            LogoutAt = null,
+            IpAddress = "192.168.1.102",
+            UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/537.36",
+            DeviceInfo = "MacBook Pro",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow.AddHours(-3),
+            UpdatedAt = DateTime.UtcNow.AddHours(-3)
+        },
+        new SessionLog
+        {
+            Id = Guid.NewGuid(),
+            UserId = Users[14].Id,
+            LoginAt = DateTime.Today.AddHours(9),
+            LogoutAt = null,
+            IpAddress = "192.168.1.103",
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/120.0",
+            DeviceInfo = "Windows 11 Desktop",
+            IsActive = true,
+            CreatedAt = DateTime.Today.AddHours(9),
+            UpdatedAt = DateTime.Today.AddHours(9)
+        }
+    };
+
+    public static List<AuditLog> AuditLogs = new()
+    {
+        new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorUserId = Users[0].Id,
+            ActorName = "admin",
+            Action = AuditAction.Create,
+            EntityType = "Branch",
+            EntityId = Branches[0].Id,
+            BranchId = Branches[0].Id,
+            Description = "Created North Branch",
+            IpAddress = "192.168.1.100",
+            CreatedAt = DateTime.UtcNow.AddDays(-30),
+            UpdatedAt = DateTime.UtcNow.AddDays(-30)
+        },
+        new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorUserId = Users[0].Id,
+            ActorName = "admin",
+            Action = AuditAction.Update,
+            EntityType = "User",
+            EntityId = Users[1].Id,
+            BranchId = Branches[0].Id,
+            Description = "Updated user bm1 role",
+            IpAddress = "192.168.1.100",
+            CreatedAt = DateTime.UtcNow.AddDays(-25),
+            UpdatedAt = DateTime.UtcNow.AddDays(-25)
+        },
+        new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorUserId = Users[0].Id,
+            ActorName = "admin",
+            Action = AuditAction.Approve,
+            EntityType = "SalaryChangeRequest",
+            EntityId = SalaryChangeRequests[2].Id,
+            BranchId = Branches[0].Id,
+            EmployeeId = Employees[10].Id,
+            Description = "Approved salary change for HR Chief",
+            IpAddress = "192.168.1.100",
+            CreatedAt = DateTime.UtcNow.AddDays(-2),
+            UpdatedAt = DateTime.UtcNow.AddDays(-2)
+        },
+        new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorUserId = Users[6].Id,
+            ActorName = "chief1_eng",
+            Action = AuditAction.Create,
+            EntityType = "WorkSchedule",
+            EntityId = WorkSchedules[0].Id,
+            DepartmentId = Departments[0].Id,
+            BranchId = Branches[0].Id,
+            Description = "Created Q1 work schedule",
+            IpAddress = "192.168.1.102",
+            CreatedAt = DateTime.UtcNow.AddDays(-25),
+            UpdatedAt = DateTime.UtcNow.AddDays(-25)
+        },
+        new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            ActorUserId = Users[1].Id,
+            ActorName = "bm1",
+            Action = AuditAction.Approve,
+            EntityType = "WorkSchedule",
+            EntityId = WorkSchedules[0].Id,
+            DepartmentId = Departments[0].Id,
+            BranchId = Branches[0].Id,
+            Description = "Approved Q1 work schedule",
+            IpAddress = "192.168.1.101",
+            CreatedAt = DateTime.UtcNow.AddDays(-15),
+            UpdatedAt = DateTime.UtcNow.AddDays(-15)
+        }
+    };
 }

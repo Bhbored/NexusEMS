@@ -1,0 +1,238 @@
+@page "/admin/users/create"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-4">
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-sm btn-outline-secondary me-3" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+            <h1 class="h2 fw-bold mb-1">Create New User</h1>
+            <p class="text-muted mb-0">Add a new user account with role and permissions</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card border-0 mb-4">
+            <div class="card-header user-form-header">
+                <h5 class="mb-0 fw-semibold">Account Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <EditForm Model="@NewUser" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Username <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewUser.Username" class="form-control" placeholder="Enter username" />
+                            <ValidationMessage For="@(() => NewUser.Username)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Email <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewUser.Email" class="form-control" type="email" placeholder="user@example.com" />
+                            <ValidationMessage For="@(() => NewUser.Email)" class="text-danger small" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Password <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="NewUser.PasswordHash" class="form-control" type="password" placeholder="Enter password" />
+                            <ValidationMessage For="@(() => NewUser.PasswordHash)" class="text-danger small" />
+                            <small class="text-muted">Minimum 8 characters</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Confirm Password <span class="text-danger">*</span></label>
+                            <InputText @bind-Value="ConfirmPassword" class="form-control" type="password" placeholder="Confirm password" />
+                            @if (!string.IsNullOrEmpty(NewUser.PasswordHash) && !string.IsNullOrEmpty(ConfirmPassword) && NewUser.PasswordHash != ConfirmPassword)
+                            {
+                                <small class="text-danger">Passwords do not match</small>
+                            }
+                        </div>
+
+                        <div class="col-12">
+                            <hr class="my-3" />
+                            <h6 class="fw-semibold mb-3">Role Assignment</h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Primary Role <span class="text-danger">*</span></label>
+                            <SfDropDownList TValue="UserRole" TItem="RoleItem"
+                                          @bind-Value="NewUser.Role"
+                                          DataSource="@RoleOptions"
+                                          Placeholder="Select primary role"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Secondary Role (Optional)</label>
+                            <SfDropDownList TValue="UserRole?" TItem="SecondaryRoleItem"
+                                          @bind-Value="NewUser.SecondaryRole"
+                                          DataSource="@SecondaryRoleOptions"
+                                          Placeholder="Select secondary role"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Branch</label>
+                            <SfDropDownList TValue="Guid?" TItem="Branch"
+                                          @bind-Value="NewUser.BranchId"
+                                          DataSource="@Branches"
+                                          Placeholder="Select branch"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Department</label>
+                            <SfDropDownList TValue="Guid?" TItem="Department"
+                                          @bind-Value="NewUser.DepartmentId"
+                                          DataSource="@FilteredDepartments"
+                                          Enabled="@(NewUser.BranchId.HasValue)"
+                                          Placeholder="Select department"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                            @if (!NewUser.BranchId.HasValue)
+                            {
+                                <small class="text-muted">Select a branch first</small>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-medium">Link to Employee</label>
+                            <SfDropDownList TValue="Guid?" TItem="Employee"
+                                          @bind-Value="NewUser.EmployeeProfileId"
+                                          DataSource="@FilteredEmployees"
+                                          Enabled="@(NewUser.BranchId.HasValue)"
+                                          Placeholder="Select employee profile"
+                                          CssClass="e-custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="@nameof(Employee.FullName)"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="GoBack">
+                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary" disabled="@(!IsFormValid)">
+                                    <i class="bi bi-check-circle me-2"></i>Create User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-0 user-info-card">
+            <div class="card-body p-4">
+                <h6 class="fw-semibold mb-3">
+                    <i class="bi bi-info-circle me-2"></i>User Setup Tips
+                </h6>
+                <ul class="user-tips-list">
+                    <li>
+                        <strong>Username:</strong> Should be unique and easy to remember
+                    </li>
+                    <li>
+                        <strong>Primary Role:</strong> Defines main permissions and access level
+                    </li>
+                    <li>
+                        <strong>Secondary Role:</strong> Optional dual responsibilities (e.g., Accounting + DepartmentChief)
+                    </li>
+                    <li>
+                        <strong>Employee Link:</strong> Connect user account to HR employee record
+                    </li>
+                    <li>
+                        <strong>Branch & Department:</strong> Required for non-Admin users
+                    </li>
+                </ul>
+
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-shield-exclamation me-2"></i>
+                    <small><strong>Security Note:</strong> User will receive login credentials via email</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private User NewUser = new() { Role = UserRole.Employee };
+    private string ConfirmPassword = string.Empty;
+    private List<Branch> Branches = new();
+    private List<Department> Departments = new();
+    private List<Employee> Employees = new();
+
+    private bool IsFormValid => !string.IsNullOrEmpty(NewUser.Username) &&
+                               !string.IsNullOrEmpty(NewUser.Email) &&
+                               !string.IsNullOrEmpty(NewUser.PasswordHash) &&
+                               NewUser.PasswordHash == ConfirmPassword;
+
+    private List<Department> FilteredDepartments =>
+        NewUser.BranchId.HasValue
+            ? Departments.Where(d => d.BranchId == NewUser.BranchId.Value).ToList()
+            : new List<Department>();
+
+    private List<Employee> FilteredEmployees =>
+        NewUser.BranchId.HasValue
+            ? Employees.Where(e => e.BranchId == NewUser.BranchId.Value && e.AssignedToUserId == null).ToList()
+            : new List<Employee>();
+
+    private List<RoleItem> RoleOptions = Enum.GetValues<UserRole>()
+        .Select(r => new RoleItem { Value = r, Text = r.ToString() })
+        .ToList();
+
+    private List<SecondaryRoleItem> SecondaryRoleOptions = new List<SecondaryRoleItem>
+    {
+        new SecondaryRoleItem { Value = null, Text = "None" }
+    }.Concat(Enum.GetValues<UserRole>()
+        .Select(r => new SecondaryRoleItem { Value = r, Text = r.ToString() }))
+        .ToList();
+
+    protected override void OnInitialized()
+    {
+        Branches = TestData.GetBranches();
+        Departments = TestData.GetDepartments();
+        Employees = TestData.GetEmployees();
+    }
+
+    private void HandleSubmit()
+    {
+        NewUser.Id = Guid.NewGuid();
+        NewUser.CreatedAt = DateTime.UtcNow;
+        NewUser.UpdatedAt = DateTime.UtcNow;
+        NewUser.IsOnline = false;
+        
+        TestData.GetUsers().Add(NewUser);
+        
+        Navigation.NavigateTo("/admin/users");
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/admin/users");
+
+    private class RoleItem
+    {
+        public UserRole Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class SecondaryRoleItem
+    {
+        public UserRole? Value { get; set; }
+        public string Text { get; set; } = string.Empty;
+    }
+}

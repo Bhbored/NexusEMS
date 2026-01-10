@@ -1,0 +1,182 @@
+@page "/admin/branches"
+@using NexusEMS.Shared.Models
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 fw-bold mb-1">Branch Management</h1>
+            <p class="text-muted mb-0">Manage company branches, locations, and branch managers</p>
+        </div>
+        <button class="btn btn-primary" @onclick="CreateBranch">
+            <i class="bi bi-plus-circle me-2"></i>Create Branch
+        </button>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card branch-stat-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="branch-stat-icon branch-stat-icon-primary me-3">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div>
+                        <div class="branch-stat-label">Total Branches</div>
+                        <div class="branch-stat-value">@Branches.Count</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card branch-stat-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="branch-stat-icon branch-stat-icon-success me-3">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div>
+                        <div class="branch-stat-label">Total Employees</div>
+                        <div class="branch-stat-value">@TotalEmployees</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card branch-stat-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="branch-stat-icon branch-stat-icon-info me-3">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <div>
+                        <div class="branch-stat-label">Total Departments</div>
+                        <div class="branch-stat-value">@TotalDepartments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card branch-stat-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="branch-stat-icon branch-stat-icon-warning me-3">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <div>
+                        <div class="branch-stat-label">Total Budget</div>
+                        <div class="branch-stat-value">@TotalBudget.ToString("C0")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 branch-main-card">
+    <div class="card-header branch-list-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">All Branches</h5>
+            <div class="input-group branch-search-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search branches..." 
+                       @bind="SearchTerm" @bind:event="oninput" />
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        @if (FilteredBranches.Any())
+        {
+            <div class="row g-4">
+                @foreach (var branch in FilteredBranches)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <BranchCard Branch="@branch" 
+                                    DepartmentCount="@GetDepartmentCount(branch.Id)"
+                                    EmployeeCount="@GetEmployeeCount(branch.Id)"
+                                    UserCount="@GetUserCount(branch.Id)"
+                                    OnViewDetails="@(() => ViewDetails(branch.Id))"
+                                    OnEdit="@(() => EditBranch(branch.Id))" />
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-inbox branch-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No branches found</h5>
+                <p class="text-muted">@(string.IsNullOrEmpty(SearchTerm) ? "Start by creating your first branch" : "No branches match your search")</p>
+                @if (string.IsNullOrEmpty(SearchTerm))
+                {
+                    <button class="btn btn-primary mt-2" @onclick="CreateBranch">
+                        <i class="bi bi-plus-circle me-2"></i>Create Branch
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<ConfirmationDialog @ref="DeleteConfirmation" Title="Delete Branch"
+                    Message="@($"Are you sure you want to delete {BranchToDelete?.Name}? This will affect all departments and employees in this branch.")" 
+                    OnConfirmation="OnDeleteConfirmed" />
+
+@code {
+    private List<Branch> Branches = new();
+    private List<Department> Departments = new();
+    private List<Employee> Employees = new();
+    private List<User> Users = new();
+    private string SearchTerm = string.Empty;
+    private ConfirmationDialog DeleteConfirmation = new();
+    private Branch? BranchToDelete;
+
+    private List<Branch> FilteredBranches => string.IsNullOrWhiteSpace(SearchTerm)
+        ? Branches
+        : Branches.Where(b =>
+            b.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+            (b.Code?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (b.Location?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+        ).ToList();
+
+    private int TotalEmployees => Employees.Count;
+    private int TotalDepartments => Departments.Count;
+    private decimal TotalBudget => Branches.Sum(b => b.Budget ?? 0);
+
+    protected override void OnInitialized()
+    {
+        Branches = TestData.GetBranches();
+        Departments = TestData.GetDepartments();
+        Employees = TestData.GetEmployees();
+        Users = TestData.GetUsers();
+    }
+
+    private int GetDepartmentCount(Guid branchId) => Departments.Count(d => d.BranchId == branchId);
+    private int GetEmployeeCount(Guid branchId) => Employees.Count(e => e.BranchId == branchId);
+    private int GetUserCount(Guid branchId) => Users.Count(u => u.BranchId == branchId);
+
+    private void CreateBranch() => Navigation.NavigateTo("/admin/branches/create");
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/branches/{id}");
+    private void EditBranch(Guid id) => Navigation.NavigateTo($"/admin/branches/edit/{id}");
+
+    private void DeleteBranch(Branch branch)
+    {
+        BranchToDelete = branch;
+        DeleteConfirmation.Show();
+    }
+
+    private void OnDeleteConfirmed(bool confirmed)
+    {
+        if (confirmed && BranchToDelete != null)
+        {
+            Branches.Remove(BranchToDelete);
+            BranchToDelete = null;
+            StateHasChanged();
+        }
+    }
+}
