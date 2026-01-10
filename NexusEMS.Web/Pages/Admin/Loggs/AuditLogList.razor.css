@@ -4,9 +4,9 @@
     text-align: center;
 }
 
-.audit-stat-card:hover {
-    transform: translateY(-2px);
-}
+    .audit-stat-card:hover {
+        transform: translateY(-2px);
+    }
 
 .audit-stat-icon {
     width: 56px;

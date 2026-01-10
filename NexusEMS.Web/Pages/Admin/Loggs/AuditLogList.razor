@@ -64,34 +64,34 @@
             <div class="col-md-3">
                 <div class="input-group audit-search-group">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" placeholder="Search..." 
+                    <input type="text" class="form-control" placeholder="Search..."
                            @bind="SearchTerm" @bind:event="oninput" />
                 </div>
             </div>
             <div class="col-md-2">
                 <SfDropDownList TValue="string" TItem="ActionFilterItem"
-                              @bind-Value="ActionFilter"
-                              DataSource="@ActionFilterOptions"
-                              Placeholder="Action"
-                              CssClass="e-custom-dropdown">
+                                @bind-Value="ActionFilter"
+                                DataSource="@ActionFilterOptions"
+                                Placeholder="Action"
+                                CssClass="e-custom-dropdown">
                     <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
                 </SfDropDownList>
             </div>
             <div class="col-md-2">
-                <SfDropDownList TValue="Guid?" TItem="BranchFilterItem"
-                              @bind-Value="BranchFilter"
-                              DataSource="@BranchFilterOptions"
-                              Placeholder="Branch"
-                              CssClass="e-custom-dropdown">
+                <SfDropDownList TValue="Guid ?" TItem="BranchFilterItem"
+                                @bind-Value="BranchFilter"
+                                DataSource="@BranchFilterOptions"
+                                Placeholder="Branch"
+                                CssClass="e-custom-dropdown">
                     <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                 </SfDropDownList>
             </div>
             <div class="col-md-3">
-                <SfDateRangePicker TValue="DateTime?"
-                                 StartDate="@StartDate"
-                                 EndDate="@EndDate"
-                                 Placeholder="Select date range"
-                                 CssClass="e-custom-date">
+                <SfDateRangePicker TValue="DateTime ?"
+                                   StartDate="@StartDate"
+                                   EndDate="@EndDate"
+                                   Placeholder="Select date range"
+                                   CssClass="e-custom-date">
                 </SfDateRangePicker>
             </div>
             <div class="col-md-2">
@@ -104,8 +104,8 @@
     <div class="card-body p-0">
         @if (FilteredAuditLogs.Any())
         {
-            <SfGrid DataSource="@FilteredAuditLogs" 
-                    AllowPaging="true" 
+            <SfGrid DataSource="@FilteredAuditLogs"
+                    AllowPaging="true"
                     AllowSorting="true">
                 <GridPageSettings PageSize="20"></GridPageSettings>
                 <GridColumns>
