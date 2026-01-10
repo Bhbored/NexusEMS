@@ -6,7 +6,7 @@ namespace NexusEMS.Web.Test;
 public static class TestData
 {
 
-    
+
     // Positions
     public static List<Position> Positions = new()
     {
@@ -72,14 +72,14 @@ public static class TestData
     // Departments
     public static List<Department> Departments = new()
     {
-        new Department { Name = "Engineering - North", Code = "ENG01", BranchId = Branches[0].Id, ChiefId = Users[6].Id, Budget = 200000, IsSystemDepartment = false , },
-        new Department { Name = "Marketing - North", Code = "MKT01", BranchId = Branches[0].Id, ChiefId = Users[7].Id, Budget = 180000, IsSystemDepartment = false },
-        new Department { Name = "HR - North", Code = "HR01", BranchId = Branches[0].Id, ChiefId = Users[10].Id, Budget = 150000, IsSystemDepartment = true },
-        new Department { Name = "Accounting - North", Code = "ACC01", BranchId = Branches[0].Id, ChiefId = Users[12].Id, Budget = 180000, IsSystemDepartment = true },
-        new Department { Name = "Engineering - South", Code = "ENG02", BranchId = Branches[1].Id, ChiefId = Users[8].Id, Budget = 220000, IsSystemDepartment = false },
-        new Department { Name = "Marketing - South", Code = "MKT02", BranchId = Branches[1].Id, ChiefId = Users[9].Id, Budget = 190000, IsSystemDepartment = false },
-        new Department { Name = "HR - South", Code = "HR02", BranchId = Branches[1].Id, ChiefId = Users[11].Id, Budget = 160000, IsSystemDepartment = true },
-        new Department { Name = "Accounting - South", Code = "ACC02", BranchId = Branches[1].Id, ChiefId = Users[13].Id, Budget = 190000, IsSystemDepartment = true }
+        new Department { Name = "Engineering - North", Code = "ENG01", BranchId = Branches[0].Id, Budget = 200000, IsSystemDepartment = false },
+        new Department { Name = "Marketing - North", Code = "MKT01", BranchId = Branches[0].Id, Budget = 180000, IsSystemDepartment = false },
+        new Department { Name = "HR - North", Code = "HR01", BranchId = Branches[0].Id, Budget = 150000, IsSystemDepartment = true },
+        new Department { Name = "Accounting - North", Code = "ACC01", BranchId = Branches[0].Id, Budget = 180000, IsSystemDepartment = true },
+        new Department { Name = "Engineering - South", Code = "ENG02", BranchId = Branches[1].Id, Budget = 220000, IsSystemDepartment = false },
+        new Department { Name = "Marketing - South", Code = "MKT02", BranchId = Branches[1].Id, Budget = 190000, IsSystemDepartment = false },
+        new Department { Name = "HR - South", Code = "HR02", BranchId = Branches[1].Id, Budget = 160000, IsSystemDepartment = true },
+        new Department { Name = "Accounting - South", Code = "ACC02", BranchId = Branches[1].Id, Budget = 190000, IsSystemDepartment = true }
     };
 
     // Employees
@@ -121,13 +121,33 @@ public static class TestData
         new Employee { FirstName = "Nicole", LastName = "Robinson", Email = "emp020@nexusems.com", Phone = "+1234567923", Gender = Gender.Female, EmployeeCode = "EMP020", EducationLevel = EducationLevel.Bachelor, DateOfBirth = new DateTime(1996, 10, 1), IsMarried = true, NumberOfChildren = 1, HireDate = new DateTime(2022, 4, 1), ContractType = ContractType.FullTime, EmploymentStatus = EmploymentStatus.Active, BranchId = Branches[1].Id, DepartmentId = Departments[5].Id, PositionId = Positions[5].Id, AssignedToUserId = Users[33].Id }
     };
 
-    //public static void AssignDepartements()
-    //{
-    //    foreach (var x in Departments)
-    //    {
-    //        x.Employees = Employees.Where(e => e.DepartmentId == x.Id).ToList();
-    //    }
-    //}
+    static TestData()
+    {
+        Departments[0].ChiefId = Employees[6].Id;
+        Departments[0].Chief = Employees[6];
+
+        Departments[1].ChiefId = Employees[7].Id;
+        Departments[1].Chief = Employees[7];
+
+        Departments[2].ChiefId = Employees[10].Id;
+        Departments[2].Chief = Employees[10];
+
+        Departments[3].ChiefId = Employees[12].Id;
+        Departments[3].Chief = Employees[12];
+
+        Departments[4].ChiefId = Employees[8].Id;
+        Departments[4].Chief = Employees[8];
+
+        Departments[5].ChiefId = Employees[9].Id;
+        Departments[5].Chief = Employees[9];
+
+        Departments[6].ChiefId = Employees[11].Id;
+        Departments[6].Chief = Employees[11];
+
+        Departments[7].ChiefId = Employees[13].Id;
+        Departments[7].Chief = Employees[13];
+    }
+
     // Placeholder lists for other models
     public static List<SalaryConfiguration> SalaryConfigurations = new();
     public static List<SalaryPackage> SalaryPackages = new();

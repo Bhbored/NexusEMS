@@ -9,11 +9,8 @@
     <p class="text-muted mb-0">Manage your company departments, budgets, and personnel.</p>
 </div>
 
-<DataGrid TItem="Department"
-          Items="@Departments"
-          Title="All Departments"
-          OnAddClick="@(() => Navigation.NavigateTo("/admin/departments/create"))"
-          FilterStrategy="@FilterDepartments">
+<DataGrid TItem="Department" Items="@Departments" Title="All Departments"
+          OnAddClick="@(() => Navigation.NavigateTo("/admin/departments/create"))" FilterStrategy="@FilterDepartments">
     <HeaderContent>
         <th>Department Name</th>
         <th>Description</th>
@@ -27,7 +24,8 @@
             <div class="fw-medium">@dept.Name</div>
         </td>
         <td>
-            <span class="d-inline-block text-truncate department-description" style="max-width: 200px;" title="@dept.Description">
+            <span class="d-inline-block text-truncate department-description" style="max-width: 200px;"
+                  title="@dept.Description">
                 @dept.Description
             </span>
         </td>
@@ -57,13 +55,11 @@
         <td class="text-end">
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-sm department-action-btn department-action-edit"
-                        @onclick="() => EditDepartment(dept.Id)"
-                        title="Edit">
+                        @onclick="() => EditDepartment(dept.Id)" title="Edit">
                     <i class="bi bi-pencil"></i>
                 </button>
                 <button class="btn btn-sm department-action-btn department-action-delete"
-                        @onclick="() => DeleteDepartment(dept)"
-                        title="Delete">
+                        @onclick="() => DeleteDepartment(dept)" title="Delete">
                     <i class="bi bi-trash"></i>
                 </button>
             </div>
@@ -71,10 +67,8 @@
     </RowTemplate>
 </DataGrid>
 
-<ConfirmationDialog @ref="DeleteConfirmation"
-                    Title="Delete Department"
-                    Message="@($"Are you sure you want to delete {DepartmentToDelete?.Name}?")"
-                    OnConfirmation="OnDeleteConfirmed" />
+<ConfirmationDialog @ref="DeleteConfirmation" Title="Delete Department"
+                    Message="@($"Are you sure you want to delete {DepartmentToDelete?.Name}?")" OnConfirmation="OnDeleteConfirmed" />
 
 @code {
     private List<Department> Departments = new();
@@ -86,10 +80,10 @@
         var departments = TestData.GetDepartments();
         var employees = TestData.GetEmployees();
 
-        foreach (var x in departments)
+        foreach (var dept in departments)
         {
-            x.Employees = employees.Where(e => e.DepartmentId == x.Id).ToList();
-            Departments.Add(x);
+            dept.Employees = employees.Where(e => e.DepartmentId == dept.Id).ToList();
+            Departments.Add(dept);
         }
     }
 
@@ -98,8 +92,8 @@
         if (string.IsNullOrWhiteSpace(searchTerm)) return true;
         searchTerm = searchTerm.ToLower();
         return dept.Name.ToLower().Contains(searchTerm) ||
-               (dept.Description?.ToLower().Contains(searchTerm) ?? false) ||
-               (dept.DepartmentChiefName?.ToLower().Contains(searchTerm) ?? false);
+        (dept.Description?.ToLower().Contains(searchTerm) ?? false) ||
+        (dept.DepartmentChiefName?.ToLower().Contains(searchTerm) ?? false);
     }
 
     private void EditDepartment(Guid id)
