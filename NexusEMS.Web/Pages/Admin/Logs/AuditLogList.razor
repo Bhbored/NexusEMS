@@ -1,0 +1,291 @@
+@page "/admin/audit-logs"
+@using NexusEMS.Shared.Models
+@using NexusEMS.Shared.Enums
+@inject TestDataService TestData
+@inject NavigationManager Navigation
+
+<div class="mb-6">
+    <div>
+        <h1 class="h2 fw-bold mb-1">Audit Logs</h1>
+        <p class="text-muted mb-0">Complete system activity tracking and change history</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card audit-stat-card">
+            <div class="card-body">
+                <div class="audit-stat-icon audit-stat-icon-primary mb-3">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                <div class="audit-stat-value">@AuditLogs.Count</div>
+                <div class="audit-stat-label">Total Activities</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card audit-stat-card">
+            <div class="card-body">
+                <div class="audit-stat-icon audit-stat-icon-success mb-3">
+                    <i class="bi bi-plus-circle"></i>
+                </div>
+                <div class="audit-stat-value">@CreateActions</div>
+                <div class="audit-stat-label">Creates</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card audit-stat-card">
+            <div class="card-body">
+                <div class="audit-stat-icon audit-stat-icon-info mb-3">
+                    <i class="bi bi-pencil"></i>
+                </div>
+                <div class="audit-stat-value">@UpdateActions</div>
+                <div class="audit-stat-label">Updates</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card audit-stat-card">
+            <div class="card-body">
+                <div class="audit-stat-icon audit-stat-icon-danger mb-3">
+                    <i class="bi bi-trash"></i>
+                </div>
+                <div class="audit-stat-value">@DeleteActions</div>
+                <div class="audit-stat-label">Deletes</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0">
+    <div class="card-header audit-list-header">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="input-group audit-search-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search..." 
+                           @bind="SearchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+            <div class="col-md-2">
+                <SfDropDownList TValue="string" TItem="ActionFilterItem"
+                              @bind-Value="ActionFilter"
+                              DataSource="@ActionFilterOptions"
+                              Placeholder="Action"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Value" Text="Text"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-2">
+                <SfDropDownList TValue="Guid?" TItem="BranchFilterItem"
+                              @bind-Value="BranchFilter"
+                              DataSource="@BranchFilterOptions"
+                              Placeholder="Branch"
+                              CssClass="e-custom-dropdown">
+                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="col-md-3">
+                <SfDateRangePicker TValue="DateTime?"
+                                 StartDate="@StartDate"
+                                 EndDate="@EndDate"
+                                 Placeholder="Select date range"
+                                 CssClass="e-custom-date">
+                </SfDateRangePicker>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" @onclick="ClearFilters">
+                    <i class="bi bi-x-circle me-2"></i>Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (FilteredAuditLogs.Any())
+        {
+            <SfGrid DataSource="@FilteredAuditLogs" 
+                    AllowPaging="true" 
+                    AllowSorting="true">
+                <GridPageSettings PageSize="20"></GridPageSettings>
+                <GridColumns>
+                    <GridColumn HeaderText="Actor" Width="150">
+                        <Template>
+                            @{
+                                var log = (context as AuditLog)!;
+                                <div class="d-flex align-items-center">
+                                    <div class="audit-avatar me-2">
+                                        @GetInitials(log.ActorName)
+                                    </div>
+                                    <span class="small">@log.ActorName</span>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Action" Width="100">
+                        <Template>
+                            @{
+                                var log = (context as AuditLog)!;
+                                var badgeClass = log.Action switch
+                                {
+                                    AuditAction.Create => "bg-success",
+                                    AuditAction.Update => "bg-info",
+                                    AuditAction.Delete => "bg-danger",
+                                    AuditAction.Approve => "bg-primary",
+                                    AuditAction.Reject => "bg-warning",
+                                    _ => "bg-secondary"
+                                };
+                                <span class="badge @badgeClass">@log.Action</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(AuditLog.EntityType)" HeaderText="Entity Type" Width="130"></GridColumn>
+                    <GridColumn Field="@nameof(AuditLog.Description)" HeaderText="Description" Width="300"></GridColumn>
+                    <GridColumn HeaderText="Branch" Width="120">
+                        <Template>
+                            @{
+                                var log = (context as AuditLog)!;
+                                if (log.BranchId.HasValue)
+                                {
+                                    var branch = Branches.FirstOrDefault(b => b.Id == log.BranchId.Value);
+                                    <span class="small">@branch?.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(AuditLog.CreatedAt)" HeaderText="Timestamp" Format="g" Width="160"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var log = (context as AuditLog)!;
+                                <button class="btn btn-sm btn-outline-primary" @onclick="() => ViewDetails(log.Id)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-journal-text audit-empty-icon"></i>
+                <h5 class="mt-3 mb-2">No audit logs found</h5>
+                <p class="text-muted">System activities will be logged here</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<AuditLog> AuditLogs = new();
+    private List<Branch> Branches = new();
+    private string SearchTerm = string.Empty;
+    private string ActionFilter = "All";
+    private Guid? BranchFilter;
+    private DateTime? StartDate;
+    private DateTime? EndDate;
+
+    private List<AuditLog> FilteredAuditLogs
+    {
+        get
+        {
+            var query = AuditLogs.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                query = query.Where(l =>
+                    l.ActorName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    l.EntityType.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    (l.Description?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+                );
+            }
+
+            if (ActionFilter != "All")
+            {
+                var action = Enum.Parse<AuditAction>(ActionFilter);
+                query = query.Where(l => l.Action == action);
+            }
+
+            if (BranchFilter.HasValue)
+            {
+                query = query.Where(l => l.BranchId == BranchFilter.Value);
+            }
+
+            if (StartDate.HasValue)
+            {
+                query = query.Where(l => l.CreatedAt >= StartDate.Value);
+            }
+
+            if (EndDate.HasValue)
+            {
+                query = query.Where(l => l.CreatedAt <= EndDate.Value);
+            }
+
+            return query.OrderByDescending(l => l.CreatedAt).ToList();
+        }
+    }
+
+    private int CreateActions => AuditLogs.Count(l => l.Action == AuditAction.Create);
+    private int UpdateActions => AuditLogs.Count(l => l.Action == AuditAction.Update);
+    private int DeleteActions => AuditLogs.Count(l => l.Action == AuditAction.Delete);
+
+    private List<ActionFilterItem> ActionFilterOptions = new()
+    {
+        new ActionFilterItem { Value = "All", Text = "All Actions" },
+        new ActionFilterItem { Value = nameof(AuditAction.Create), Text = "Create" },
+        new ActionFilterItem { Value = nameof(AuditAction.Update), Text = "Update" },
+        new ActionFilterItem { Value = nameof(AuditAction.Delete), Text = "Delete" },
+        new ActionFilterItem { Value = nameof(AuditAction.Approve), Text = "Approve" },
+        new ActionFilterItem { Value = nameof(AuditAction.Reject), Text = "Reject" },
+        new ActionFilterItem { Value = nameof(AuditAction.Apply), Text = "Apply" }
+    };
+
+    private List<BranchFilterItem> BranchFilterOptions = new();
+
+    protected override void OnInitialized()
+    {
+        AuditLogs = TestData.GetAuditLogs();
+        Branches = TestData.GetBranches();
+
+        BranchFilterOptions = new List<BranchFilterItem> { new BranchFilterItem { Id = null, Name = "All Branches" } };
+        BranchFilterOptions.AddRange(Branches.Select(b => new BranchFilterItem { Id = b.Id, Name = b.Name }));
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return "";
+        var parts = name.Split(' ');
+        if (parts.Length >= 2)
+            return $"{parts[0].FirstOrDefault()}{parts[1].FirstOrDefault()}";
+        return name.Substring(0, Math.Min(2, name.Length)).ToUpper();
+    }
+
+    private void ViewDetails(Guid id) => Navigation.NavigateTo($"/admin/audit-logs/{id}");
+
+    private void ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        ActionFilter = "All";
+        BranchFilter = null;
+        StartDate = null;
+        EndDate = null;
+    }
+
+    private class ActionFilterItem
+    {
+        public string Value { get; set; } = string.Empty;
+        public string Text { get; set; } = string.Empty;
+    }
+
+    private class BranchFilterItem
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
